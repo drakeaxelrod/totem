@@ -3,6 +3,7 @@
 
 ## Reference
 
+-  https://www.reddit.com/r/KeyboardLayouts/comments/1iqo9ob/galite_galliumgraphite_hybrid_with_simplified/
 <!-- ![Miryoku](./assets/miryoku-reference.png) -->
 
 - **Keyboard:** Totem
