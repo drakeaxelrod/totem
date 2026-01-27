@@ -25,6 +25,7 @@ N E T S G     P H A E I
 X Q M W Z     K F ' ; .
 ```
 
+<!--
 ### Symbol Layer
 
 ```
@@ -35,38 +36,10 @@ Left Hand     Right Hand
 ```
 
 ![Symbol Layer](./assets/svg/layers/sym.svg)
+-->
 
-### Number Layer
+### Number/Symbol Layer
 
-
-```
-Left Hand     Right Hand
-` 7 8 9 0     [ ]     ,
-  4 5 6 -
-  1 2 3 =     / \ ' ; .
-
-Shifted
-
-Left Hand     Right Hand
-~ & * ( )     { }     >
-  $ % ^ -
-  ! @ # +     ? | " : <
-
-```
-
-```
-Left Hand     Right Hand
-1 2 3 4 5     7 8 9 0
-              4 5 6
-              1 2 3
-Shifted
-
-Left Hand     Right Hand
-~ & * ( )     { }     >
-  $ % ^ -
-  ! @ # +     ? | " : <
-
-```
 
 
 ![Number Layer](./assets/svg/layers/num.svg)
@@ -79,20 +52,7 @@ Left Hand     Right Hand
               1 2 3
 
 Shifted
-! @ # $ %     ^ & * ( )
-              $ % ^
-              ! @ #
-
-```
-
-```
 Left Hand     Right Hand
-1 2 3 4 5     7 8 9 0
-              4 5 6
-              1 2 3
-
-
-Shifted
 ! @ # $ %     ^ & * ( )
               $ % ^
               ! @ #

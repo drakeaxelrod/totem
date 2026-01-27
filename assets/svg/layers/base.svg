@@ -381,7 +381,7 @@
       <g transform="translate(34, 209) rotate(-10.0)" class="key keypos-20">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
         <a href="#Gaming">
-          <text x="0" y="0" class="key tap layer-activator"></text>
+          <text x="0" y="0" class="key tap layer-activator">Shift</text>
         </a>
       </g>
       <g transform="translate(97, 223) rotate(-10.0)" class="key keypos-21">
@@ -427,42 +427,42 @@
       <g transform="translate(817, 209) rotate(10.0)" class="key keypos-31">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
         <a href="#Gaming">
-          <text x="0" y="0" class="key tap layer-activator"></text>
+          <text x="0" y="0" class="key tap layer-activator">Shift</text>
         </a>
       </g>
       <g transform="translate(255, 236)" class="key trans keypos-32">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key trans" />
-        <text x="0" y="0" class="key tap"></text>
+        <text x="0" y="0" class="key tap">1</text>
       </g>
       <g transform="translate(320, 245) rotate(15.0)" class="key keypos-33">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap"></text>
+        <text x="0" y="0" class="key tap">2</text>
         <a href="#Nav">
           <!-- <text x="0" y="0" class="key hold layer-activator">Nav</text> -->
         </a>
       </g>
       <g transform="translate(381, 270) rotate(30.0)" class="key keypos-34">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap"></text>
+        <text x="0" y="0" class="key tap">3</text>
         <a href="#Sym">
           <!-- <text x="0" y="0" class="key hold layer-activator">Sym</text> -->
         </a>
       </g>
       <g transform="translate(470, 270) rotate(-30.0)" class="key keypos-35">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap"></text>
+        <text x="0" y="0" class="key tap">4</text>
         <a href="#Num">
           <!-- <text x="0" y="0" class="key hold layer-activator">Num</text> -->
         </a>
       </g>
       <g transform="translate(531, 245) rotate(-15.0)" class="key keypos-36">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap"></text>
+        <text x="0" y="0" class="key tap">5</text>
         <!-- <text x="0" y="0" class="key hold">Shift</text> -->
       </g>
       <g transform="translate(596, 236)" class="key trans keypos-37">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key trans" />
-        <text x="0" y="0" class="key tap"></text>
+        <text x="0" y="0" class="key tap">6</text>
       </g>
     </g>
   </g>
