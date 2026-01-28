@@ -45,16 +45,12 @@ Left Hand     Right Hand
 ![Number Layer](./assets/svg/layers/num.svg)
 
 
-```
-Left Hand     Right Hand
-1 2 3 4 5     7 8 9 0
-              4 5 6
-              1 2 3
 
-Shifted
-Left Hand     Right Hand
-! @ # $ %     ^ & * ( )
-              $ % ^
-              ! @ #
+### Nav Layer
 
-```
+
+![Nav Layer](./assets/svg/layers/nav.svg)
+
+- arrow up/down/left/right keys, home/end, pg up/down
+- mouse up/down/left/right keys, mouse buttons left/right/center, scroll up/down/left/right, mouse jiggler.
+- Caps Lock, Copy, Paste, Cut, and Undo, Redo, ScrLock, NumLock, hyper, meh,
