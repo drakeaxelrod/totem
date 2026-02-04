@@ -54,3 +54,13 @@ Left Hand     Right Hand
 - arrow up/down/left/right keys, home/end, pg up/down
 - mouse up/down/left/right keys, mouse buttons left/right/center, scroll up/down/left/right, mouse jiggler.
 - Caps Lock, Copy, Paste, Cut, and Undo, Redo, ScrLock, NumLock, hyper, meh,
+
+
+### Func Layer
+
+
+![Func Layer](./assets/svg/layers/func.svg)
+
+- arrow up/down/left/right keys, home/end, pg up/down
+- mouse up/down/left/right keys, mouse buttons left/right/center, scroll up/down/left/right, mouse jiggler.
+- Caps Lock, Copy, Paste, Cut, and Undo, Redo, ScrLock, NumLock, hyper, meh,
