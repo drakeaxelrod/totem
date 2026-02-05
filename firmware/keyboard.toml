@@ -33,7 +33,7 @@ keymap = [
         ["B",      "L",      "D",      "C",      "V",           "J",      "Y",      "O",      "U",      "Comma"    ],
         ["N",      "R",      "T",      "S",      "G",           "P",      "H",      "A",      "E",      "I"        ],
         ["MT(X,LCtrl)", "MT(Q,LGui)", "MT(M,LAlt)", "W", "Z",   "K", "F", "MT(Quote,RAlt)", "MT(Semicolon,RGui)", "MT(Dot,RCtrl)"],
-        ["LShift", "_",      "LT(1,Escape)", "LT(2,Space)", "LT(3,Tab)", "LT(4,Enter)", "LT(5,Backspace)", "Delete", "_", "RShift"]
+        ["LShift", "_",      "LT(1,Escape)", "LT(2,Space)", "LT(3,Tab)", "LT(4,Enter)", "TD(0)", "Delete", "_", "RShift"]
     ],
     # Layer 1: Function + BLE (hold Escape)
     # F1-F10 on top row, F keys on right numpad positions
@@ -84,7 +84,7 @@ keymap = [
     ],
     # Layer 6: Gaming (toggle from Function layer via TG(6))
     # TG(6) on N position to toggle off
-    # WASD on left for movement, numbers on top for weapon switching
+    # WASD on left for movement, numbers on top for qweapon switching
     [
         ["Tab",    "Q",      "W",      "E",      "R",           "Kc1",    "Kc2",    "Kc3",    "Kc4",    "Kc5"      ],
         ["TG(6)",  "A",      "S",      "D",      "F",           "G",      "H",      "J",      "K",      "L"        ],
@@ -97,6 +97,16 @@ keymap = [
 enabled = true
 # Clear stored keymap on next boot to apply TOML config
 clear_storage = true
+
+# Morse/Tap-Dance configuration
+# TD(0) = Backspace with layer 5 access
+# - tap: single backspace
+# - hold: activate layer 5
+# - hold_after_tap: repeat backspace (tap then hold)
+[behavior.morse]
+morses = [
+    { tap = "Backspace", hold = "MO(5)", hold_after_tap = "Backspace" }
+]
 
 # Chip-specific config for nRF52840
 # WARNING: Only enable DC/DC regulators if your board has external LC filters
