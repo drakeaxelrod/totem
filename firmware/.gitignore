@@ -1,0 +1,10 @@
+target
+build
+
+*.bin
+*.elf
+*.hex
+*.uf2
+
+.DS_Store
+.direnv
