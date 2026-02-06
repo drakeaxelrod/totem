@@ -86,17 +86,17 @@ keymap = [
     # TG(6) on N position to toggle off
     # WASD on left for movement, numbers on top for qweapon switching
     [
-        ["Tab",    "Q",      "W",      "E",      "R",           "Kc1",    "Kc2",    "Kc3",    "Kc4",    "Kc5"      ],
-        ["TG(6)",  "A",      "S",      "D",      "F",           "G",      "H",      "J",      "K",      "L"        ],
-        ["LCtrl",  "Z",      "X",      "C",      "V",           "B",      "N",      "M",      "Comma",  "Dot"      ],
-        ["_",      "_",      "_",      "_",      "_",           "_",      "_",      "_",      "_",      "_"        ]
+        ["Q",    "W",      "E",      "R",      "T",             "Kc1",    "Kc2",    "Kc3",    "Kc4",    "Kc5"      ],
+        ["A",    "S",      "D",      "F",      "G",             "Kc6",      "Kc7",      "Kc8",      "Kc9",      "Kc0"        ],
+        ["MT(Z,LCtrl)", "MT(X,LGui)", "MT(C,LAlt)", "V", "B",   "N", "M", "MT(Comma,RAlt)", "MT(Semicolon,RGui)", "MT(Dot,RCtrl)"],
+        ["LShift",   "_", "Escape",   "Space",    "Tab",         "Enter", "Backspace", "Delete", "_", "TG(6)"        ]
     ]
 ]
 
 [storage]
 enabled = true
 # Clear stored keymap on next boot to apply TOML config
-clear_storage = true
+clear_storage = false
 
 # Morse/Tap-Dance configuration
 # TD(0) = Backspace with layer 5 access
