@@ -104,6 +104,10 @@ clear_storage = false
 # - hold: activate layer 5
 # - hold_after_tap: repeat backspace (tap then hold)
 [behavior.morse]
+enable_flow_tap = true
+prior_idle_time = "120ms"
+hold_timeout = "240ms"
+gap_timeout = "230ms"
 morses = [
     { tap = "Backspace", hold = "MO(5)", hold_after_tap = "Backspace" }
 ]
@@ -117,7 +121,11 @@ dcdc_reg1 = true
 
 [ble]
 enabled = true
-
+# Battery level reporting via internal VDDH measurement (nRF52840)
+battery_adc_pin = "vddh"
+# battery_adc_pin = "P0_31"
+# adc_divider_measured = 510
+# adc_divider_total = 1510
 [split]
 connection = "ble"
 
