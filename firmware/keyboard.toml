@@ -112,6 +112,13 @@ morses = [
     { tap = "Backspace", hold = "MO(5)", hold_after_tap = "Backspace" }
 ]
 
+[rmk]
+# Mouse key interval (ms) - controls mouse movement speed
+mouse_key_interval = 16
+# Mouse wheel interval (ms) - controls scrolling speed
+mouse_wheel_interval = 80
+
+
 # Chip-specific config for nRF52840
 # WARNING: Only enable DC/DC regulators if your board has external LC filters
 # XIAO nRF52840 has these, so it's safe to enable for better power efficiency
