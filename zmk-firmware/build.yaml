@@ -1,0 +1,6 @@
+include:
+  - board: xiao_ble
+    shield: totem_left
+  - board: xiao_ble
+    shield: totem_right
+# there is no settingsreset (needed) for the XIAO

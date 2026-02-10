@@ -1,0 +1,159 @@
+# Documentation: https://rmk.rs/docs
+# POWER SWITCH: LEFT IS ON, RIGHT IS OFF (BOTH SIDES)
+[keyboard]
+name = "TOTEM"
+product_name = "TOTEM"
+vendor_id = 0x4C4B
+product_id = 0x544D
+manufacturer = "GEIGEIGEIST"
+serial_number = "vial:f64c2b3c"
+chip = "nrf52840"
+usb_enable = true
+
+# TOTEM: 38-key split keyboard
+# Matrix: 4 rows x 10 cols (5 cols per side)
+# Physical layout:
+#          | 00 | 01 | 02 | 03 | 04 |   | 05 | 06 | 07 | 08 | 09 |
+#          | 10 | 11 | 12 | 13 | 14 |   | 15 | 16 | 17 | 18 | 19 |
+#     | 30 | 20 | 21 | 22 | 23 | 24 |   | 25 | 26 | 27 | 28 | 29 | 39 |
+#                    | 32 | 33 | 34 |   | 35 | 36 | 37 |
+
+[layout]
+rows = 4
+cols = 10
+layers = 7
+keymap = [
+    # Layer 0: Base (Gallium)
+    # Top:    B  L  D  C  V  |  J  Y  O  U  ,
+    # Home:   N  R  T  S  G  |  P  H  A  E  I    (HRM: Gui Alt Ctrl Shift | Shift Ctrl Alt Gui)
+    # Bottom: X  Q  M  W  Z  |  K  F  '  ;  .
+    # Thumbs: Shift _ Esc(Num) Space(Nav) Tab(Mouse) | Enter(Fn) Bksp Del(Media) _ Shift
+    [
+        ["B",      "L",      "D",      "C",      "V",           "J",      "Y",      "O",      "U",      "Comma"    ],
+        ["MT(N,LGui,HRM)", "MT(R,LAlt,HRM)", "MT(T,LCtrl,HRM)", "MT(S,LShift,HRM)", "G",  "P", "MT(H,RShift,HRM)", "MT(A,RCtrl,HRM)", "MT(E,RAlt,HRM)", "MT(I,RGui,HRM)"],
+        ["X",      "Q",      "M",      "W",      "Z",           "K",      "F",      "Quote",  "Semicolon", "Dot"  ],
+        ["LShift", "_", "LT(5,Escape,TH)", "LT(2,Space,TH)", "LT(3,Tab,TH)", "LT(1,Enter,TH)", "Backspace", "LT(4,Delete,TH)", "_", "RShift"]
+    ],
+    # Layer 1: Function + System (hold Enter)
+    # Top: F1-F10, Home: left HRM pass-through, right HRM on F4-F6/F11
+    # Bottom left: BLE, Bottom right: Pause (system keys next to F-keys)
+    [
+        ["F1",     "F2",     "F3",     "F4",     "F5",          "F6",     "F7",     "F8",     "F9",     "F10"      ],
+        ["_",      "_",      "_",      "_",      "_",           "PrintScreen", "MT(F4,RShift,HRM)", "MT(F5,RCtrl,HRM)", "MT(F6,RAlt,HRM)", "MT(F11,RGui,HRM)"],
+        ["User6",  "User0",  "User1",  "User2",  "User5",       "ScrollLock",      "F1",      "F2",      "F3",      "F12"    ],
+        ["_",      "_",      "_",      "_",      "_",           "Pause",      "_",      "_",      "_",      "TG(6)"    ]
+    ],
+    # Layer 2: Nav/Edit (hold Space)
+    # Left: editing (Undo/Cut/Copy/Paste/Redo) — HRM mods pass through for Shift+Arrow etc.
+    # Right: vim arrows + PgUp/PgDn/Home/End
+    # Bottom: Insert, CapsWord (auto-off after one word), Menu (context menu)
+    [
+        ["Undo",   "Cut",    "Copy",   "Paste",  "Again",       "Home",   "PageDown", "PageUp", "End",   "Delete"   ],
+        ["_",      "_",      "_",      "_",      "_",           "_",      "Left",   "Down",   "Up",     "Right"    ],
+        ["_",      "_",      "_",      "_",      "_",           "Insert", "CapsWordToggle", "Menu", "_", "_"        ],
+        ["_",      "_",      "_",      "_",      "_",           "_",      "_",      "_",      "_",      "_"        ]
+    ],
+    # Layer 3: Mouse (hold Tab)
+    # Right: vim-like mouse movement, Left: scroll + accel
+    # Left bottom: browser nav (natural while mousing), Thumbs: mouse buttons
+    [
+        ["MouseAccel0", "MouseAccel1", "MouseAccel2", "_", "_", "MouseWheelUp", "MouseWheelDown", "MouseWheelLeft", "MouseWheelRight", "_"],
+        ["_",      "_",      "_",      "_",      "_",           "_",      "MouseLeft", "MouseDown", "MouseUp", "MouseRight"],
+        ["WwwBack", "WwwForward", "WwwRefresh", "WwwHome", "_", "_",      "MouseBtn4", "MouseBtn5", "_",   "_"        ],
+        ["_",      "_",      "_",      "_",      "_",           "MouseBtn1", "MouseBtn2", "MouseBtn3", "_", "_"    ]
+    ],
+    # Layer 4: Media (hold Delete)
+    # Right: volume/playback/brightness, Right thumb holds Delete to activate
+    [
+        ["_",      "_",      "_",      "_",      "_",           "AudioMute", "AudioVolDown", "AudioVolUp", "_", "_"],
+        ["_",      "_",      "_",      "_",      "_",           "MediaPrevTrack", "MediaPlayPause", "MediaNextTrack", "MediaStop", "Calculator"],
+        ["_",      "_",      "_",      "_",      "_",           "BrightnessDown", "BrightnessUp", "MediaEject", "_", "_"],
+        ["_",      "_",      "_",      "_",      "_",           "MediaRewind", "MediaPlayPause", "MediaFastForward", "_", "_"]
+    ],
+    # Layer 5: Num/Sym (hold Escape)
+    # 1 2 3 4 5 | 6 7 8 9 0
+    # ; ' [ ] - | - 4 5 6 /
+    # / ` , . = | = 1 2 3 \
+    [
+        ["Kc1",    "Kc2",    "Kc3",    "Kc4",    "Kc5",         "Kc6",    "Kc7",    "Kc8",    "Kc9",    "Kc0"      ],
+        ["MT(Semicolon,LGui,HRM)", "MT(Quote,LAlt,HRM)", "MT(LeftBracket,LCtrl,HRM)", "MT(RightBracket,LShift,HRM)", "Minus", "Minus", "MT(Kc4,RShift,HRM)", "MT(Kc5,RCtrl,HRM)", "MT(Kc6,RAlt,HRM)", "MT(Slash,RGui,HRM)"],
+        ["Slash",  "Grave",  "Comma",  "Dot",    "Equal",        "Equal",  "Kc1",    "Kc2",    "Kc3",    "Backslash"],
+        ["_",      "_",      "_",      "_",      "_",            "_",      "_",      "_",      "_",      "_"        ]
+    ],
+    # Layer 6: Gaming (toggle via TG(6) from Function layer)
+    # WASD movement, dedicated mods on bottom (no HRM for gaming)
+    [
+        ["Q",      "W",      "E",      "R",      "T",           "Kc1",    "Kc2",    "Kc3",    "Kc4",    "Kc5"      ],
+        ["A",      "S",      "D",      "F",      "G",           "Kc6",    "Kc7",    "Kc8",    "Kc9",    "Kc0"      ],
+        ["MT(Z,LCtrl)", "MT(X,LGui)", "MT(C,LAlt)", "V", "B",   "N",      "M",      "Comma",  "Dot",    "Slash"    ],
+        ["LShift", "_",      "Escape", "Space",  "Tab",          "Enter",  "Backspace", "Delete", "_",   "TG(6)"    ]
+    ]
+]
+
+[storage]
+enabled = true
+# Clear stored keymap on next boot to apply TOML config
+clear_storage = false
+
+# Tap-hold behavior configuration
+[behavior.morse]
+enable_flow_tap = true
+prior_idle_time = "150ms"
+hold_timeout = "200ms"
+gap_timeout = "230ms"
+morses = []
+
+# Per-key profiles for fine-tuned tap-hold behavior
+[behavior.morse.profiles]
+# Home Row Mods: conservative to prevent misfires during fast typing
+# unilateral_tap: same-hand press always triggers tap (prevents accidental mods)
+# permissive_hold: press+release another key while holding triggers hold
+HRM = { unilateral_tap = true, permissive_hold = true, hold_timeout = "280ms", gap_timeout = "250ms" }
+# Thumb Hold: responsive layer activation for thumb keys
+# hold_on_other_press: immediately activates layer when another key is pressed
+TH = { hold_on_other_press = true, unilateral_tap = false, hold_timeout = "200ms", gap_timeout = "200ms" }
+
+[rmk]
+# Mouse: lower interval = faster movement (16ms ≈ 60fps)
+mouse_key_interval = 10
+# Scroll: lower interval = faster scrolling
+mouse_wheel_interval = 50
+
+
+# Chip-specific config for nRF52840
+# WARNING: Only enable DC/DC regulators if your board has external LC filters
+# XIAO nRF52840 has these, so it's safe to enable for better power efficiency
+[chip.nrf52840]
+dcdc_reg0 = true
+dcdc_reg1 = true
+
+[ble]
+enabled = true
+# Battery level reporting via ADC pin with voltage divider (XIAO nRF52840)
+battery_adc_pin = "P0_31"
+adc_divider_measured = 510
+adc_divider_total = 1510
+[split]
+connection = "ble"
+
+# Central = Left half
+[split.central]
+rows = 4
+cols = 5
+row_offset = 0
+col_offset = 0
+
+[split.central.matrix]
+row_pins = ["P0_02", "P0_03", "P0_28", "P0_29"]
+col_pins = ["P0_04", "P0_05", "P1_15", "P1_14", "P1_13"]
+
+# Peripheral = Right half
+[[split.peripheral]]
+rows = 4
+cols = 5
+row_offset = 0
+col_offset = 5
+
+[split.peripheral.matrix]
+row_pins = ["P0_02", "P0_03", "P0_28", "P0_29"]
+col_pins = ["P1_13", "P1_14", "P1_15", "P0_05", "P0_04"]
