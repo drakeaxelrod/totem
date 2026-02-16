@@ -34,13 +34,13 @@ keymap = [
     # Top:    B  L  D  C  V  |  J  Y  O  U  ,
     # Home:   N  R  T  S  G  |  P  H  A  E  I   (HRM: Gui Alt Ctrl Shift | Shift Ctrl Alt Gui)
     # Bottom: X  Q  M  W  Z  |  K  F  '  ;  .
-    # Thumbs: Tab _ Esc(Util) Space(Nav) StickyShift | Enter Bksp(Num) Del(Fun) _ Tab
+    # Thumbs: LShift _ Esc(Util) Space(Nav) StickyShift | Enter Bksp(Num) Del(Fun) _ RShift
     # Hyper (Shift+Ctrl+Alt+Gui) on W and F via chained modifiers in MT()
     [
         ["B",      "L",      "D",      "C",      "V",           "J",      "Y",      "O",      "U",      "Comma"    ],
         ["MT(N,LGui,HRM)", "MT(R,LAlt,HRM)", "MT(T,LCtrl,HRM)", "MT(S,LShift,HRM)", "G",  "P", "MT(H,RShift,HRM)", "MT(A,RCtrl,HRM)", "MT(E,RAlt,HRM)", "MT(I,RGui,HRM)"],
         ["X",      "Q",      "M",      "MT(W, LShift | LCtrl | LAlt | LGui, HRM)", "Z",  "K", "MT(F, RShift | RCtrl | RAlt | RGui, HRM)", "Quote", "Semicolon", "Dot"],
-        ["Tab", "_", "LT(4,Escape,TH)", "LT(1,Space,TH)", "Tab", "Enter", "LT(2,Backspace,TH)", "LT(3,Delete,TH)", "_", "Tab"]
+        ["LShift", "_", "LT(4,Escape,TH)", "LT(1,Space,TH)", "Tab", "Enter", "LT(2,Backspace,TH)", "LT(3,Delete,TH)", "_", "RShift"]
     ],
     # Layer 1: Nav (hold Space)
     # Left: editing + explicit mods, Right: vim arrows (HJKL = ←↓↑→) + Home/End/PgUp/PgDn
@@ -124,7 +124,7 @@ TH = { hold_on_other_press = true, unilateral_tap = false, hold_timeout = "200ms
 #           ╰─────────────┴─────────────╯
 # Gallium: B L D C V | J Y O U ,
 #          N R T S G | P H A E I
-#     Tab X Q M W Z  | K F ' ; . Tab
+#     LShift X Q M W Z  | K F ' ; . RShift
 [behavior.combo]
 timeout = "80ms"
 combos = [
