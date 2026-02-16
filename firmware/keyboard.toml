@@ -40,7 +40,7 @@ keymap = [
         ["B",      "L",      "D",      "C",      "V",           "J",      "Y",      "O",      "U",      "Comma"    ],
         ["MT(N,LGui,HRM)", "MT(R,LAlt,HRM)", "MT(T,LCtrl,HRM)", "MT(S,LShift,HRM)", "G",  "P", "MT(H,RShift,HRM)", "MT(A,RCtrl,HRM)", "MT(E,RAlt,HRM)", "MT(I,RGui,HRM)"],
         ["X",      "Q",      "M",      "MT(W, LShift | LCtrl | LAlt | LGui, HRM)", "Z",  "K", "MT(F, RShift | RCtrl | RAlt | RGui, HRM)", "Quote", "Semicolon", "Dot"],
-        ["Tab", "_", "LT(4,Escape,TH)", "LT(1,Space,TH)", "OSM(LShift)", "Enter", "LT(2,Backspace,TH)", "LT(3,Delete,TH)", "_", "Tab"]
+        ["Tab", "_", "LT(4,Escape,TH)", "LT(1,Space,TH)", "Tab", "Enter", "LT(2,Backspace,TH)", "LT(3,Delete,TH)", "_", "Tab"]
     ],
     # Layer 1: Nav (hold Space)
     # Left: editing + explicit mods, Right: vim arrows (HJKL = ←↓↑→) + Home/End/PgUp/PgDn
@@ -120,13 +120,13 @@ TH = { hold_on_other_press = true, unilateral_tap = false, hold_timeout = "200ms
 #   │ LT4 LT3 LT2 LT1 LT0 │ RT0 RT1 RT2 RT3 RT4 │
 #   │ LM4 LM3 LM2 LM1 LM0 │ RM0 RM1 RM2 RM3 RM4 │
 # LB5 LB4 LB3 LB2 LB1 LB0 │ RB0 RB1 RB2 RB3 RB4 RB5
-#   ╰───────╮ LH2 LH1 LH0 │ RH0 RH1 RH2 ╭───────╯
+#   ╰───────╮ LH2 LH1 LH0 │ RH0 RH1 RH2 ╭───────╯t
 #           ╰─────────────┴─────────────╯
 # Gallium: B L D C V | J Y O U ,
 #          N R T S G | P H A E I
 #     Tab X Q M W Z  | K F ' ; . Tab
 [behavior.combo]
-timeout = "50ms"
+timeout = "80ms"
 combos = [
     # Left vertical: top + home row — @ # $ %
     { actions = ["L", "MT(R,LAlt,HRM)"], output = "WM(Kc2, LShift)" },

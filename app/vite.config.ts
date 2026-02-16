@@ -27,7 +27,7 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       "@assets": path.resolve(__dirname, "../assets"),
-      "@firmware": path.resolve(__dirname, "../rmk-firmware"),
+      "@firmware": path.resolve(__dirname, "../firmware"),
     },
   },
   clearScreen: false,
