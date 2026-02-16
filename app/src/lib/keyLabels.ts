@@ -12,12 +12,11 @@ interface MorseEntry {
 
 const LAYER_NAMES: Record<number, string> = {
   0: "Base",
-  1: "Func",
-  2: "Nav",
-  3: "Mouse",
-  4: "Media",
-  5: "Num",
-  6: "Gaming",
+  1: "Nav",
+  2: "Num",
+  3: "Func",
+  4: "Util",
+  5: "Gaming",
 };
 
 // Maps RMK named keycodes to short display labels
@@ -38,6 +37,10 @@ const KEYCODE_LABELS: Record<string, string> = {
   // Numbers
   Kc0: "0", Kc1: "1", Kc2: "2", Kc3: "3", Kc4: "4",
   Kc5: "5", Kc6: "6", Kc7: "7", Kc8: "8", Kc9: "9",
+
+  // Keypad
+  KpPlus: "+", KpAsterisk: "*", KpMinus: "-", KpSlash: "/",
+  KpDot: ".", KpEqual: "=", KpEnter: "Enter",
 
   // Modifiers
   LShift: "Shift", RShift: "Shift",
@@ -118,6 +121,9 @@ const KEYCODE_LABELS: Record<string, string> = {
   User2: "BT3",
   User5: "BT Clr",
   User6: "USB",
+
+  // Explicit no-key
+  No: "",
 };
 
 // Modifier short names for hold display
@@ -132,6 +138,49 @@ const MOD_LABELS: Record<string, string> = {
   RShift: "Shift",
 };
 
+// Shifted character labels (US layout) for WM(key, LShift) display
+const SHIFTED_LABELS: Record<string, string> = {
+  Kc1: "!", Kc2: "@", Kc3: "#", Kc4: "$", Kc5: "%",
+  Kc6: "^", Kc7: "&", Kc8: "*", Kc9: "(", Kc0: ")",
+  Minus: "_", Equal: "+", LeftBracket: "{", RightBracket: "}",
+  Backslash: "|", Semicolon: ":", Quote: '"', Comma: "<",
+  Dot: ">", Slash: "?", Grave: "~",
+};
+
+// Resolve chained modifiers like "LShift | LCtrl | LAlt | LGui"
+function resolveModChain(modStr: string): string {
+  const mods = modStr.split(/\s*\|\s*/).map((m) => m.trim());
+  if (mods.length === 1) return MOD_LABELS[mods[0]] ?? mods[0];
+
+  // Normalize to base modifier types (strip L/R prefix)
+  const modTypes = new Set(mods.map((m) => m.replace(/^[LR]/, "")));
+  if (modTypes.size >= 4) return "Hyper";
+  if (modTypes.size === 3 && !modTypes.has("Gui")) return "Meh";
+
+  // Deduplicate display labels
+  const seen = new Set<string>();
+  return mods
+    .map((m) => MOD_LABELS[m] ?? m)
+    .filter((l) => {
+      if (seen.has(l)) return false;
+      seen.add(l);
+      return true;
+    })
+    .join("+");
+}
+
+// Resolve WM(key, modifier) to a display label
+function resolveWmLabel(key: string, modStr: string): string {
+  const mods = modStr.split(/\s*\|\s*/).map((m) => m.trim());
+  const isShiftOnly =
+    mods.length === 1 && (mods[0] === "LShift" || mods[0] === "RShift");
+  if (isShiftOnly && SHIFTED_LABELS[key]) {
+    return SHIFTED_LABELS[key];
+  }
+  const keyLabel = KEYCODE_LABELS[key] ?? key;
+  return `${resolveModChain(modStr)}+${keyLabel}`;
+}
+
 export function resolveKeyLabel(
   code: string,
   morses: MorseEntry[] = [],
@@ -140,12 +189,12 @@ export function resolveKeyLabel(
     return { tap: "\u25BD", isTransparent: true };
   }
 
-  // MT(tap, mod) or MT(tap, mod, profile) — mod-tap
-  const mtMatch = code.match(/^MT\((\w+),\s*(\w+)(?:,\s*\w+)?\)$/);
+  // MT(tap, mod) or MT(tap, mod1 | mod2, profile) — mod-tap with chained modifiers
+  const mtMatch = code.match(/^MT\((\w+),\s*([^,)]+?)(?:,\s*\w+)?\)$/);
   if (mtMatch) {
     return {
       tap: KEYCODE_LABELS[mtMatch[1]] ?? mtMatch[1],
-      hold: MOD_LABELS[mtMatch[2]] ?? mtMatch[2],
+      hold: resolveModChain(mtMatch[2].trim()),
     };
   }
 
@@ -157,6 +206,19 @@ export function resolveKeyLabel(
       tap: KEYCODE_LABELS[ltMatch[2]] ?? ltMatch[2],
       hold: LAYER_NAMES[layerIdx] ?? `L${layerIdx}`,
     };
+  }
+
+  // WM(key, modifier) — key with modifier active
+  const wmMatch = code.match(/^WM\((\w+),\s*([^)]+)\)$/);
+  if (wmMatch) {
+    return { tap: resolveWmLabel(wmMatch[1], wmMatch[2].trim()) };
+  }
+
+  // OSM(modifier) — one-shot modifier
+  const osmMatch = code.match(/^OSM\(([^)]+)\)$/);
+  if (osmMatch) {
+    const label = resolveModChain(osmMatch[1].trim());
+    return { tap: label === "Shift" ? "\u21E7" : label };
   }
 
   // TD(n) — tap-dance (morse)
@@ -188,6 +250,13 @@ export function resolveKeyLabel(
   if (moMatch) {
     const layerIdx = parseInt(moMatch[1]);
     return { tap: LAYER_NAMES[layerIdx] ?? `MO${layerIdx}` };
+  }
+
+  // DF(layer) — default layer switch
+  const dfMatch = code.match(/^DF\((\d+)\)$/);
+  if (dfMatch) {
+    const layerIdx = parseInt(dfMatch[1]);
+    return { tap: LAYER_NAMES[layerIdx] ?? `DF${layerIdx}` };
   }
 
   // Function keys

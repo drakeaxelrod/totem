@@ -83,8 +83,26 @@ args = [
 ]
 dependencies = ["objcopy-peripheral"]
 
-[tasks.uf2]
+# Build just the normal UF2s (used internally by uf2 task)
+[tasks.uf2-firmware]
 dependencies = ["uf2-central", "uf2-peripheral"]
+
+# Default: builds normal + reset UF2s (reset build is fast — incremental)
+[tasks.uf2]
+script_runner = "@shell"
+script = [
+    "cargo make uf2-firmware",
+    "cp build/totem-left.uf2 build/totem-left-normal.uf2",
+    "cp build/totem-right.uf2 build/totem-right-normal.uf2",
+    "cp keyboard.toml keyboard.toml.build-bak",
+    "sed -i '/^clear_storage/s/=.*/= true/' keyboard.toml",
+    "cargo make uf2-firmware",
+    "cp build/totem-left.uf2 build/totem-left-reset.uf2",
+    "cp build/totem-right.uf2 build/totem-right-reset.uf2",
+    "mv keyboard.toml.build-bak keyboard.toml",
+    "mv build/totem-left-normal.uf2 build/totem-left.uf2",
+    "mv build/totem-right-normal.uf2 build/totem-right.uf2",
+]
 
 [tasks.clean]
 command = "rm"

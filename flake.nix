@@ -23,27 +23,43 @@
         # Shell commands available inside nix develop
         rmk-firmware-script = pkgs.writeShellScriptBin "rmk-firmware" ''
           set -e
-          cd "$(git rev-parse --show-toplevel)/rmk-firmware"
-          echo "Building TOTEM RMK firmware..."
-          cargo make uf2
+          ROOT="$(git rev-parse --show-toplevel)"
+          mkdir -p "$ROOT/build"
+          cd "$ROOT"
+          docker compose run --rm rmk
           echo ""
           echo "UF2 files ready:"
-          ls -lh build/*.uf2
+          ls -lh "$ROOT/build"/rmk-*.uf2
         '';
 
         zmk-firmware-script = pkgs.writeShellScriptBin "zmk-firmware" ''
           set -e
           ROOT="$(git rev-parse --show-toplevel)"
-          echo "Building TOTEM ZMK firmware..."
-          nix build "path:$ROOT/zmk-firmware" --no-link --print-out-paths | while read -r outpath; do
-            mkdir -p "$ROOT/zmk-firmware/build"
-            for uf2 in "$outpath"/*.uf2; do
-              cp "$uf2" "$ROOT/zmk-firmware/build/"
-            done
-          done
+          mkdir -p "$ROOT/build"
+          cd "$ROOT"
+          docker compose run --rm zmk
           echo ""
           echo "UF2 files ready:"
-          ls -lh "$ROOT/zmk-firmware/build/"*.uf2
+          ls -lh "$ROOT/build"/zmk-*.uf2
+        '';
+
+        build-all-script = pkgs.writeShellScriptBin "build-all" ''
+          set -e
+          ROOT="$(git rev-parse --show-toplevel)"
+          mkdir -p "$ROOT/build"
+          cd "$ROOT"
+
+          echo "════════════════════════════════════════"
+          echo " Building TOTEM firmware + app"
+          echo "════════════════════════════════════════"
+
+          docker compose up --build --abort-on-container-exit
+
+          echo ""
+          echo "════════════════════════════════════════"
+          echo " All builds complete!"
+          echo "════════════════════════════════════════"
+          ls -lh "$ROOT/build/"
         '';
 
         gui-script = pkgs.writeShellScriptBin "gui" ''
@@ -87,11 +103,14 @@
             atk
             libappindicator-gtk3
             librsvg
+            dbus
+            udev
           ];
 
           packages = [
             rmk-firmware-script
             zmk-firmware-script
+            build-all-script
             gui-script
           ];
 
@@ -100,9 +119,10 @@
 
           shellHook = ''
             echo "TOTEM development environment"
-            echo "  rmk-firmware  - build RMK firmware UF2 files"
+            echo "  rmk-firmware  - build RMK firmware (Docker)"
+            echo "  zmk-firmware  - build ZMK firmware (Docker)"
+            echo "  build-all     - build everything via docker compose"
             echo "  gui           - launch GUI dev server"
-            echo "  zmk-firmware  - build ZMK firmware UF2 files"
           '';
         };
       }

@@ -1,6 +1,7 @@
 import type { FunctionComponent } from "preact";
 import { useState } from "preact/hooks";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import BatteryIndicator from "./BatteryIndicator";
 
 const btn =
   "w-8 h-8 flex items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:bg-slate-200/60 dark:hover:bg-white/[0.08] hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer";
@@ -20,12 +21,15 @@ const Titlebar: FunctionComponent = () => {
       data-tauri-drag-region
       class="absolute top-0 left-0 right-0 z-10 flex items-center justify-between h-10 px-3 select-none"
     >
-      <span
-        data-tauri-drag-region
-        class="text-[13px] font-extrabold text-slate-400 dark:text-slate-500 tracking-[0.25em]"
-      >
-        TOTEM
-      </span>
+      <div class="flex items-center gap-3">
+        <span
+          data-tauri-drag-region
+          class="text-[13px] font-extrabold text-slate-400 dark:text-slate-500 tracking-[0.25em]"
+        >
+          TOTEM
+        </span>
+        <BatteryIndicator />
+      </div>
 
       <div class="flex items-center gap-0.5">
         <button

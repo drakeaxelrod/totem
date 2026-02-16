@@ -1,5 +1,3 @@
-import { parse } from "smol-toml";
-
 export interface KeyboardConfig {
   layers: string[][][]; // [layerIndex][row][col]
   layerCount: number;
@@ -8,9 +6,8 @@ export interface KeyboardConfig {
   morses: { tap: string; hold: string; hold_after_tap?: string }[];
 }
 
-export function parseKeyboardToml(raw: string): KeyboardConfig {
-  const config = parse(raw);
-
+/** Extract keyboard config from a pre-parsed TOML object (parsed at build time by vite-plugin-toml) */
+export function parseKeyboardConfig(config: Record<string, unknown>): KeyboardConfig {
   const layout = config.layout as {
     rows: number;
     cols: number;

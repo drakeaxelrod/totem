@@ -1,0 +1,57 @@
+/* --------------------------------- combos --------------------------------- */
+/*                    Gallium base layer key positions
+   ╭────────────────────────────┬────────────────────────────╮
+   │ LT4=B LT3=L LT2=D LT1=C LT0=V │ RT0=J RT1=Y RT2=O RT3=U RT4=, │
+   │ LM4=N LM3=R LM2=T LM1=S LM0=G │ RM0=P RM1=H RM2=A RM3=E RM4=I │
+LH4=Tab LB4=X LB3=Q LB2=M LB1=W LB0=Z │ RB0=K RB1=F RB2=' RB3=; RB4=. RH4=Tab
+   ╰─────────╮ LH2=Esc LH1=Spc LH0=⇧ │ RH0=Ent RH1=Bsp RH2=Del ╭───────╯
+             ╰─────────────────────────┴─────────────────────────╯             */
+
+// Prevent combos from triggering during fast typing (like flow_tap in RMK)
+#undef COMBO_HOOK
+#define COMBO_HOOK require-prior-idle-ms = <150>;
+
+#define COMBO_TERM_FAST 18
+#define COMBO_TERM_SLOW 30
+
+// Left vertical: top + home row — @ # $ %
+ZMK_COMBO(at,    &kp AT,    LT3 LM3, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(hash,  &kp HASH,  LT2 LM2, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(dllr,  &kp DLLR,  LT1 LM1, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(prcnt, &kp PRCNT, LT0 LM0, BASE NAV NUM, COMBO_TERM_SLOW)
+
+// Left vertical: home + bottom row — ` \ = ~
+ZMK_COMBO(grave, &kp GRAVE, LM3 LB3, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(bslh,  &kp BSLH,  LM2 LB2, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(equal, &kp EQUAL, LM1 LB1, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(tilde, &kp TILDE, LM0 LB0, BASE NAV NUM, COMBO_TERM_SLOW)
+
+// Left horizontal: clipboard (Ctrl+X/C/V on Linux)
+ZMK_COMBO(cut,   &kp LC(X), LB3 LB1, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(copy,  &kp LC(C), LB3 LB2, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(paste, &kp LC(V), LB2 LB1, BASE NAV NUM, COMBO_TERM_FAST)
+
+// Right vertical: top + home row — ^ + * &
+ZMK_COMBO(caret, &kp CARET, RT0 RM0, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(plus,  &kp PLUS,  RT1 RM1, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(star,  &kp STAR,  RT2 RM2, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(amps,  &kp AMPS,  RT3 RM3, BASE NAV NUM, COMBO_TERM_SLOW)
+
+// Right vertical: home + bottom row — _ - / |
+ZMK_COMBO(under, &kp UNDER, RM0 RB0, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(minus, &kp MINUS, RM1 RB1, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(fslh,  &kp FSLH,  RM2 RB2, BASE NAV NUM, COMBO_TERM_SLOW)
+ZMK_COMBO(pipe,  &kp PIPE,  RM3 RB3, BASE NAV NUM, COMBO_TERM_SLOW)
+
+// Right horizontal: brackets and groupings
+ZMK_COMBO(lbkt,  &kp LBKT,  RT1 RT2, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(rbkt,  &kp RBKT,  RT2 RT3, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(lpar,  &kp LPAR,  RM1 RM2, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(rpar,  &kp RPAR,  RM2 RM3, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(lbrc,  &kp LBRC,  RB1 RB2, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(rbrc,  &kp RBRC,  RB2 RB3, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(lt,    &kp LT,    RM0 RM1, BASE NAV NUM, COMBO_TERM_FAST)
+ZMK_COMBO(gt,    &kp GT,    RM3 RM4, BASE NAV NUM, COMBO_TERM_FAST)
+
+// Caps word: both index fingers (S + H)
+ZMK_COMBO(capsw, &caps_word, LM1 RM1, BASE NAV NUM, COMBO_TERM_FAST)

@@ -1,0 +1,12 @@
+FROM rust:1-bookworm
+
+RUN rustup target add thumbv7em-none-eabihf \
+    && cargo install cargo-make cargo-binutils cargo-hex-to-uf2 flip-link
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    llvm-dev libclang-dev clang \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV LIBCLANG_PATH=/usr/lib/llvm-14/lib
+
+WORKDIR /work

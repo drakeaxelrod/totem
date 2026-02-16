@@ -1,0 +1,2 @@
+# TOTEM keyboard — allow logged-in user access to Vial HID interface
+KERNEL=="hidraw*", ATTRS{idVendor}=="4c4b", ATTRS{idProduct}=="544d", MODE="0660", TAG+="uaccess"
