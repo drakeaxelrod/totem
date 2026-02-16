@@ -20,46 +20,65 @@
           extensions = [ "rust-src" "rustfmt" "llvm-tools" ];
           targets = [ "thumbv7em-none-eabihf" ];
         };
-        # Shell commands available inside nix develop
-        rmk-firmware-script = pkgs.writeShellScriptBin "rmk-firmware" ''
+
+        firmware-script = pkgs.writeShellScriptBin "firmware" ''
           set -e
           ROOT="$(git rev-parse --show-toplevel)"
-          mkdir -p "$ROOT/build"
-          cd "$ROOT"
-          docker compose run --rm rmk
+          BUILD="$ROOT/build"
+          mkdir -p "$BUILD"
+          cd "$ROOT/firmware"
+
+          uf2() {
+            cargo objcopy --release --bin "$1" -- -O ihex "$BUILD/$2.hex"
+            cargo hex-to-uf2 --input-path "$BUILD/$2.hex" --output-path "$BUILD/$2.uf2" --family nrf52840
+          }
+
+          if [ "''${1:-}" = "--dongle" ]; then
+            echo "=== Dongle mode (3 devices) ==="
+            # Swap to dongle config, clean to force proc-macro rebuild
+            cp keyboard.toml keyboard.toml.bak
+            cp keyboard-dongle.toml keyboard.toml
+            trap 'mv keyboard.toml.bak keyboard.toml' EXIT
+
+            cargo clean --release 2>/dev/null || true
+
+            echo "Building dongle (USB receiver)..."
+            cargo build --release --bin central
+            echo "Building left half (peripheral 0)..."
+            cargo build --release --bin peripheral
+            echo "Building right half (peripheral 1)..."
+            cargo build --release --bin peripheral2
+
+            echo "Converting to UF2..."
+            uf2 central totem-dongle
+            uf2 peripheral totem-left
+            uf2 peripheral2 totem-right
+
+            echo ""
+            echo "UF2 files:"
+            echo "  build/totem-dongle.uf2  (USB dongle)"
+            echo "  build/totem-left.uf2    (left half)"
+            echo "  build/totem-right.uf2   (right half)"
+          else
+            echo "=== Normal mode (left=central, right=peripheral) ==="
+            echo "Building central (left half)..."
+            cargo build --release --bin central
+            echo "Building peripheral (right half)..."
+            cargo build --release --bin peripheral
+
+            echo "Converting to UF2..."
+            uf2 central totem-left
+            uf2 peripheral totem-right
+
+            echo ""
+            echo "UF2 files:"
+            echo "  build/totem-left.uf2   (central / left half)"
+            echo "  build/totem-right.uf2  (peripheral / right half)"
+          fi
+
           echo ""
-          echo "UF2 files ready:"
-          ls -lh "$ROOT/build"/rmk-*.uf2
-        '';
-
-        zmk-firmware-script = pkgs.writeShellScriptBin "zmk-firmware" ''
-          set -e
-          ROOT="$(git rev-parse --show-toplevel)"
-          mkdir -p "$ROOT/build"
-          cd "$ROOT"
-          docker compose run --rm zmk
-          echo ""
-          echo "UF2 files ready:"
-          ls -lh "$ROOT/build"/zmk-*.uf2
-        '';
-
-        build-all-script = pkgs.writeShellScriptBin "build-all" ''
-          set -e
-          ROOT="$(git rev-parse --show-toplevel)"
-          mkdir -p "$ROOT/build"
-          cd "$ROOT"
-
-          echo "════════════════════════════════════════"
-          echo " Building TOTEM firmware + app"
-          echo "════════════════════════════════════════"
-
-          docker compose up --build --abort-on-container-exit
-
-          echo ""
-          echo "════════════════════════════════════════"
-          echo " All builds complete!"
-          echo "════════════════════════════════════════"
-          ls -lh "$ROOT/build/"
+          echo "Flash via USB (double-tap reset to enter bootloader):"
+          echo "  cp build/totem-*.uf2 /run/media/\$USER/XIAO-SENSE/"
         '';
 
         gui-script = pkgs.writeShellScriptBin "gui" ''
@@ -108,9 +127,7 @@
           ];
 
           packages = [
-            rmk-firmware-script
-            zmk-firmware-script
-            build-all-script
+            firmware-script
             gui-script
           ];
 
@@ -119,10 +136,9 @@
 
           shellHook = ''
             echo "TOTEM development environment"
-            echo "  rmk-firmware  - build RMK firmware (Docker)"
-            echo "  zmk-firmware  - build ZMK firmware (Docker)"
-            echo "  build-all     - build everything via docker compose"
-            echo "  gui           - launch GUI dev server"
+            echo "  firmware           - build normal mode (left=central, right=peripheral)"
+            echo "  firmware --dongle  - build dongle mode (dongle + left + right)"
+            echo "  gui       - launch GUI dev server"
           '';
         };
       }

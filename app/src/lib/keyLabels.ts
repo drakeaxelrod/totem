@@ -169,6 +169,12 @@ function resolveModChain(modStr: string): string {
     .join("+");
 }
 
+// Common Ctrl+key shortcuts → friendly names
+const CTRL_SHORTCUTS: Record<string, string> = {
+  C: "Copy", X: "Cut", V: "Paste",
+  Z: "Undo", A: "SelAll",
+};
+
 // Resolve WM(key, modifier) to a display label
 function resolveWmLabel(key: string, modStr: string): string {
   const mods = modStr.split(/\s*\|\s*/).map((m) => m.trim());
@@ -176,6 +182,11 @@ function resolveWmLabel(key: string, modStr: string): string {
     mods.length === 1 && (mods[0] === "LShift" || mods[0] === "RShift");
   if (isShiftOnly && SHIFTED_LABELS[key]) {
     return SHIFTED_LABELS[key];
+  }
+  const isCtrlOnly =
+    mods.length === 1 && (mods[0] === "LCtrl" || mods[0] === "RCtrl");
+  if (isCtrlOnly && CTRL_SHORTCUTS[key]) {
+    return CTRL_SHORTCUTS[key];
   }
   const keyLabel = KEYCODE_LABELS[key] ?? key;
   return `${resolveModChain(modStr)}+${keyLabel}`;

@@ -54,10 +54,10 @@ keymap = [
     # Left: numpad + operators, Right: explicit mods for chording
     # Use right-side Shift to chord: Shift+= → +, Shift+8 → *, Shift+9 → (, etc.
     [
-        ["KpPlus", "Kc7",    "Kc8",    "Kc9",    "KpAsterisk",  "_",      "_",      "_",      "_",      "_"        ],
-        ["Kc0",    "Kc4",    "Kc5",    "Kc6",    "Equal",       "_",      "LShift", "LCtrl",   "LAlt",   "LGui"    ],
+        ["KpPlus", "Kc7",    "Kc8",    "Kc9",    "Kc0",  "_",      "_",      "_",      "_",      "_"        ],
+        ["KpAsterisk",    "Kc4",    "Kc5",    "Kc6",    "Equal",       "_",      "LShift", "LCtrl",   "LAlt",   "LGui"    ],
         ["Minus",  "Kc1",    "Kc2",    "Kc3",    "Slash",       "_",      "_",      "_",      "_",      "_"        ],
-        ["Kc9",    "_",      "_",      "Dot",    "Semicolon",   "_",      "_",      "_",      "_",      "Kc0"      ]
+        ["WM(Kc9, LShift)", "_", "_", "Dot", "Semicolon", "_", "_", "_", "_", "WM(Kc0, LShift)"]
     ],
     # Layer 3: Function (hold Delete)
     # Left: F-keys in numpad layout, Right: volume/media/brightness + mods for chording
@@ -115,8 +115,16 @@ HRM = { unilateral_tap = true, permissive_hold = true, hold_timeout = "280ms", g
 # hold_on_other_press: immediately activates layer when another key is pressed
 TH = { hold_on_other_press = true, unilateral_tap = false, hold_timeout = "200ms", gap_timeout = "200ms" }
 
-# Combos — simultaneous key presses produce symbols
-# Uses WM(key, modifier) for shifted symbols: WM(Kc2, LShift) = @
+# Combos from bsag layout — positional reference:
+#   ╭─────────────────────┬─────────────────────╮
+#   │ LT4 LT3 LT2 LT1 LT0 │ RT0 RT1 RT2 RT3 RT4 │
+#   │ LM4 LM3 LM2 LM1 LM0 │ RM0 RM1 RM2 RM3 RM4 │
+# LB5 LB4 LB3 LB2 LB1 LB0 │ RB0 RB1 RB2 RB3 RB4 RB5
+#   ╰───────╮ LH2 LH1 LH0 │ RH0 RH1 RH2 ╭───────╯
+#           ╰─────────────┴─────────────╯
+# Gallium: B L D C V | J Y O U ,
+#          N R T S G | P H A E I
+#     Tab X Q M W Z  | K F ' ; . Tab
 [behavior.combo]
 timeout = "80ms"
 combos = [
@@ -130,6 +138,11 @@ combos = [
     { actions = ["MT(T,LCtrl,HRM)", "M"], output = "Backslash" },
     { actions = ["MT(S,LShift,HRM)", "MT(W, LShift | LCtrl | LAlt | LGui, HRM)"], output = "Equal" },
     { actions = ["G", "Z"], output = "WM(Grave, LShift)" },
+    # Left horizontal: Escape (N+R+T), clipboard (Ctrl+X/C/V)
+    { actions = ["MT(R,LAlt,HRM)", "MT(T,LCtrl,HRM)", "MT(S,LShift,HRM)"], output = "Escape" },
+    { actions = ["Q", "MT(W, LShift | LCtrl | LAlt | LGui, HRM)"], output = "WM(X, LCtrl)" },
+    { actions = ["Q", "M"], output = "WM(C, LCtrl)" },
+    { actions = ["M", "MT(W, LShift | LCtrl | LAlt | LGui, HRM)"], output = "WM(V, LCtrl)" },
     # Right vertical: top + home row — ^ + * &
     { actions = ["J", "P"], output = "WM(Kc6, LShift)" },
     { actions = ["Y", "MT(H,RShift,HRM)"], output = "WM(Equal, LShift)" },
@@ -140,7 +153,7 @@ combos = [
     { actions = ["MT(H,RShift,HRM)", "MT(F, RShift | RCtrl | RAlt | RGui, HRM)"], output = "Minus" },
     { actions = ["MT(A,RCtrl,HRM)", "Quote"], output = "Slash" },
     { actions = ["MT(E,RAlt,HRM)", "Semicolon"], output = "WM(Backslash, LShift)" },
-    # Right horizontal: brackets and groupings
+    # Right horizontal: brackets [] () {} < >
     { actions = ["Y", "O"], output = "LeftBracket" },
     { actions = ["O", "U"], output = "RightBracket" },
     { actions = ["MT(H,RShift,HRM)", "MT(A,RCtrl,HRM)"], output = "WM(Kc9, LShift)" },
@@ -149,11 +162,7 @@ combos = [
     { actions = ["Quote", "Semicolon"], output = "WM(RightBracket, LShift)" },
     { actions = ["P", "MT(H,RShift,HRM)"], output = "WM(Comma, LShift)" },
     { actions = ["MT(E,RAlt,HRM)", "MT(I,RGui,HRM)"], output = "WM(Dot, LShift)" },
-    # Left horizontal: clipboard (Linux Ctrl+X/C/V)
-    { actions = ["Q", "MT(W, LShift | LCtrl | LAlt | LGui, HRM)"], output = "Cut" },
-    { actions = ["Q", "M"], output = "Copy" },
-    { actions = ["M", "MT(W, LShift | LCtrl | LAlt | LGui, HRM)"], output = "Paste" },
-    # Caps word: both index fingers
+    # Caps word: both index fingers (S + H)
     { actions = ["MT(S,LShift,HRM)", "MT(H,RShift,HRM)"], output = "CapsWordToggle" },
 ]
 

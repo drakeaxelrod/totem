@@ -1,9 +1,15 @@
 import type { FunctionComponent } from "preact";
 import type { KeyLabel } from "../lib/keyLabels";
 
+export interface ResolvedCombo {
+  keyposIndices: number[];
+  outputLabel: string;
+}
+
 interface KeyboardSvgProps {
   keys: KeyLabel[];
   darkMode?: boolean;
+  combos?: ResolvedCombo[];
 }
 
 interface KeyGroupProps {
@@ -98,7 +104,33 @@ const KEY_POSITIONS: {
   { transform: "translate(596, 236)", keypos: 37, isTransKey: true },
 ];
 
-const KeyboardSvg: FunctionComponent<KeyboardSvgProps> = ({ keys, darkMode }) => {
+// Pre-compute center coordinates from transform strings
+const KEY_CENTERS: { x: number; y: number }[] = KEY_POSITIONS.map((pos) => {
+  const m = pos.transform.match(/translate\((\d+),\s*(\d+)\)/);
+  return { x: parseInt(m![1]), y: parseInt(m![2]) };
+});
+
+// Map keypos to visual row for combo orientation detection
+function getKeyRow(kp: number): number {
+  if (kp <= 9) return 0;   // top
+  if (kp <= 19) return 1;  // home
+  if (kp <= 31) return 2;  // bottom + pinky extras
+  return 3;                 // thumbs
+}
+
+// Detect left/right hand for cross-hand combo detection
+function isLeftHand(kp: number): boolean {
+  if (kp <= 4) return true;
+  if (kp <= 9) return false;
+  if (kp <= 14) return true;
+  if (kp <= 19) return false;
+  if (kp <= 25) return true;  // left pinky extra + bottom left
+  if (kp <= 31) return false; // bottom right + right pinky extra
+  if (kp <= 34) return true;  // left thumbs
+  return false;                // right thumbs
+}
+
+const KeyboardSvg: FunctionComponent<KeyboardSvgProps> = ({ keys, darkMode, combos }) => {
   // Light: crisp white keys, strong contrast
   // Dark: subtle raised keys from dark background
   const grad = darkMode
@@ -189,6 +221,19 @@ const KeyboardSvg: FunctionComponent<KeyboardSvgProps> = ({ keys, darkMode }) =>
           font-weight: 700;
           opacity: 0.9;
         }
+
+        line.combo-line {
+          stroke-width: 1.5;
+          opacity: 0.35;
+        }
+        rect.combo-pill {
+          fill: url(#keyGradientCombo);
+          stroke-width: 1;
+        }
+        text.combo-label {
+          font-size: 10px;
+          font-weight: 700;
+        }
       `}</style>
       <g transform="translate(30, 0)">
         <g transform="translate(0, 56)">
@@ -201,6 +246,58 @@ const KeyboardSvg: FunctionComponent<KeyboardSvgProps> = ({ keys, darkMode }) =>
               isTransKey={pos.isTransKey}
             />
           ))}
+          {combos && combos.map((combo, i) => {
+            const centers = combo.keyposIndices.map((k) => KEY_CENTERS[k]);
+            const midX = centers.reduce((s, c) => s + c.x, 0) / centers.length;
+            const midY = centers.reduce((s, c) => s + c.y, 0) / centers.length;
+            const pillW = Math.max(combo.outputLabel.length * 6.5 + 10, 18);
+            const pillH = 15;
+            const comboStroke = darkMode ? "#60a5fa" : "#7dd3fc";
+
+            // Cross-hand: pill in center gap with lines to each key
+            const allLeft = combo.keyposIndices.every((k) => isLeftHand(k));
+            const allRight = combo.keyposIndices.every((k) => !isLeftHand(k));
+            const isCrossHand = !allLeft && !allRight;
+
+            // Max pairwise distance to detect non-adjacent keys
+            let maxDist = 0;
+            for (let a = 0; a < centers.length; a++) {
+              for (let b = a + 1; b < centers.length; b++) {
+                const dx = centers[a].x - centers[b].x;
+                const dy = centers[a].y - centers[b].y;
+                maxDist = Math.max(maxDist, Math.sqrt(dx * dx + dy * dy));
+              }
+            }
+            const needsLines = isCrossHand || maxDist > 95;
+
+            // Pill position: center gap for cross-hand, offset for distant same-hand
+            const pillX = isCrossHand ? 425 : midX;
+            const comboRow = getKeyRow(combo.keyposIndices[0]);
+            const pillY = needsLines && !isCrossHand
+              ? (comboRow >= 2 ? midY + 20 : midY - 25)
+              : midY;
+
+            return (
+              <g key={`combo-${i}`}>
+                {needsLines && centers.map((c, j) => (
+                  <line
+                    key={j}
+                    x1={c.x} y1={c.y} x2={pillX} y2={pillY}
+                    class="combo-line" stroke={comboStroke}
+                  />
+                ))}
+                <rect
+                  x={pillX - pillW / 2} y={pillY - pillH / 2}
+                  width={pillW} height={pillH}
+                  rx="5" ry="5"
+                  class="combo-pill" stroke={comboStroke}
+                />
+                <text x={pillX} y={pillY} class="combo-label">
+                  {combo.outputLabel}
+                </text>
+              </g>
+            );
+          })}
         </g>
       </g>
     </svg>

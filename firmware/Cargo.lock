@@ -1782,8 +1782,6 @@ checksum = "a96887878f22d7bad8a3b6dc5b7440e0ada9a245242924394987b21cf2210a4c"
 [[package]]
 name = "rmk"
 version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a301e62e9d2d9f2e44922c121a605aa064f2ef96c5d6f3c4d5fb9e177205186"
 dependencies = [
  "bitfield-struct",
  "bt-hci",
@@ -1828,8 +1826,6 @@ dependencies = [
 [[package]]
 name = "rmk-config"
 version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f3166813f01b6d3a23260d67cc12e31e97affa89812a499872a33f86688629e"
 dependencies = [
  "cargo_toml",
  "config",
@@ -1846,8 +1842,6 @@ dependencies = [
 [[package]]
 name = "rmk-macro"
 version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17f1aa766e731010e185ec92f1e1db6b9a0a1b3c42ae712bdadb7c7976fa9539"
 dependencies = [
  "cargo_toml",
  "darling",
@@ -1858,8 +1852,10 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rmk-config",
+ "rmk-types",
  "serde",
  "serde_derive",
+ "strum",
  "syn 2.0.114",
  "toml",
 ]
@@ -1867,8 +1863,6 @@ dependencies = [
 [[package]]
 name = "rmk-types"
 version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ec537c7aebb4079311d27b06ec5e82be34a4c0478642317113627d7c36145ff"
 dependencies = [
  "bitfield-struct",
  "defmt 1.0.1",
@@ -1973,9 +1967,9 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "sequential-storage"
-version = "6.0.1"
+version = "7.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6f93d860af08a0079f1c596b65176d5ea2bca1f977ba6210d4547aa16865477"
+checksum = "d4580ee0fa08cd41bee9f5b50ed309877e18735370fd4eef5766cc82863ef772"
 dependencies = [
  "defmt 1.0.1",
  "embedded-storage-async",

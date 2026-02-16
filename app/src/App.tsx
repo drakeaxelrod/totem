@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "preact/hooks";
 import { invoke } from "@tauri-apps/api/core";
-import KeyboardSvg from "./components/KeyboardSvg";
+import KeyboardSvg, { type ResolvedCombo } from "./components/KeyboardSvg";
 import LayerSelector from "./components/LayerSelector";
 import Titlebar from "./components/Titlebar";
 import Settings, { type AppSettings } from "./components/Settings";
@@ -43,8 +43,29 @@ function loadSettings(): AppSettings {
   return { darkMode: false, transparentBg: false, showTitlebar: true, keymapSource: "toml" };
 }
 
+// Build action string → keypos reverse map from base layer
+const actionToKeypos = new Map<string, number>();
+const layer0 = tomlKeyboard.layers[0];
+KEYPOS_TO_MATRIX.forEach(([row, col], keypos) => {
+  const action = layer0[row]?.[col];
+  if (action && action !== "_") actionToKeypos.set(action, keypos);
+});
+
+// Resolve combos to keypos indices + display labels
+const resolvedCombos: ResolvedCombo[] = tomlKeyboard.combos
+  .map((c) => {
+    const indices = c.actions.map((a) => actionToKeypos.get(a));
+    if (indices.some((i) => i === undefined)) return null;
+    return {
+      keyposIndices: indices as number[],
+      outputLabel: resolveKeyLabel(c.output).tap,
+    };
+  })
+  .filter((c): c is ResolvedCombo => c !== null);
+
 function App() {
   const [activeLayer, setActiveLayer] = useState(0);
+  const [showCombos, setShowCombos] = useState(false);
   const [settings, setSettings] = useState<AppSettings>(loadSettings);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [vialKeymap, setVialKeymap] = useState<VialKeymap | null>(null);
@@ -136,14 +157,30 @@ function App() {
 
       <main data-tauri-drag-region class="absolute inset-0 flex flex-col items-center justify-center px-3">
         <div data-tauri-drag-region class="w-full">
-          <KeyboardSvg keys={keys} darkMode={settings.darkMode} />
+          <KeyboardSvg
+            keys={keys}
+            darkMode={settings.darkMode}
+            combos={showCombos && activeLayer === 0 ? resolvedCombos : undefined}
+          />
         </div>
-        <div class="mt-6">
+        <div class="mt-6 flex items-center gap-2">
           <LayerSelector
             layers={layerNames}
             activeLayer={activeLayer}
             onSelect={setActiveLayer}
           />
+          {activeLayer === 0 && (
+            <button
+              onClick={() => setShowCombos((s) => !s)}
+              class={`px-3 py-1.5 rounded-lg text-[13px] font-semibold tracking-wide uppercase cursor-pointer transition-colors ${
+                showCombos
+                  ? "bg-sky-500 text-white shadow-sm"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-black/[0.06] dark:hover:bg-white/[0.08]"
+              }`}
+            >
+              Combos
+            </button>
+          )}
         </div>
       </main>
     </div>
