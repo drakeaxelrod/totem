@@ -62,7 +62,7 @@
           src = zmk-src;
           board = "xiao_ble//zmk";
           shield = "totem_settings_reset";
-          zephyrDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+          zephyrDepsHash = "sha256-sCIbjeRbmKivNQQB4O/E7Hd/1mwfhhLPQTPWE6vADco=";
           meta = {
             description = "ZMK settings reset for TOTEM (boots from 0x1000)";
             license = nixpkgs.lib.licenses.mit;
@@ -135,7 +135,17 @@
           BUILD="$ROOT/build"
           mkdir -p "$BUILD"
 
-          if [ "''${1:-}" = "--bootloader" ]; then
+          # Parse flags
+          DONGLE=false RESET=false BOOTLOADER=false
+          for arg in "$@"; do
+            case "$arg" in
+              --dongle) DONGLE=true ;;
+              --reset) RESET=true ;;
+              --bootloader) BOOTLOADER=true ;;
+            esac
+          done
+
+          if $BOOTLOADER; then
             echo "=== Downloading Adafruit bootloader for XIAO nRF52840 Sense ==="
             ${pkgs.curl}/bin/curl -fSL -o "$BUILD/xiao-bootloader-update.uf2" \
               "https://github.com/0hotpotman0/BLE_52840_Core/raw/main/bootloader/Seeed_XIAO_nRF52840_Sense/update-Seeed_XIAO_nRF52840_Sense_bootloader-0.6.1_nosd.uf2"
@@ -143,17 +153,15 @@
             exit 0
           fi
 
-          if [ "''${1:-}" = "--reset" ]; then
+          if $RESET; then
             echo "=== Building ZMK settings reset ==="
             OUT=$(nix build "$ROOT#zmk-settings-reset" --no-link --print-out-paths)
             install -m 644 "$OUT/zmk.uf2" "$BUILD/totem-zmk-settings-reset.uf2"
             echo "  → build/totem-zmk-settings-reset.uf2"
             echo ""
-            echo "Flash this FIRST to clear stale data, then flash the real firmware."
-            exit 0
           fi
 
-          if [ "''${1:-}" = "--dongle" ]; then
+          if $DONGLE; then
             echo "=== Building ZMK dongle firmware (3 devices) ==="
             OUT=$(nix build "$ROOT#zmk-dongle" --no-link --print-out-paths)
             install -m 644 "$OUT/zmk_central.uf2" "$BUILD/totem-zmk-dongle.uf2"
@@ -163,19 +171,16 @@
             echo "  → build/totem-zmk-dongle.uf2       (USB dongle)"
             echo "  → build/totem-zmk-dongle-left.uf2  (left half)"
             echo "  → build/totem-zmk-dongle-right.uf2 (right half)"
-            echo ""
-            echo "Flash settings_reset on ALL 3 devices first, then flash the real firmware."
-            echo "Flash: cp build/totem-zmk-dongle*.uf2 /run/media/$USER/XIAO-SENSE/"
-            exit 0
+          else
+            echo "=== Building ZMK firmware ==="
+            OUT=$(nix build "$ROOT#zmk" --no-link --print-out-paths)
+            install -m 644 "$OUT/zmk_left.uf2" "$BUILD/totem-zmk-left.uf2"
+            install -m 644 "$OUT/zmk_right.uf2" "$BUILD/totem-zmk-right.uf2"
+
+            echo "  → build/totem-zmk-left.uf2  (central / left half)"
+            echo "  → build/totem-zmk-right.uf2 (peripheral / right half)"
           fi
 
-          echo "=== Building ZMK firmware ==="
-          OUT=$(nix build "$ROOT#zmk" --no-link --print-out-paths)
-          install -m 644 "$OUT/zmk_left.uf2" "$BUILD/totem-zmk-left.uf2"
-          install -m 644 "$OUT/zmk_right.uf2" "$BUILD/totem-zmk-right.uf2"
-
-          echo "  → build/totem-zmk-left.uf2  (central / left half)"
-          echo "  → build/totem-zmk-right.uf2 (peripheral / right half)"
           echo ""
           echo "Flash: cp build/totem-zmk-*.uf2 /run/media/$USER/XIAO-SENSE/"
         '';

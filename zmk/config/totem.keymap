@@ -27,10 +27,10 @@
 #define KEYS_R 5 6 7 8 9 15 16 17 18 19 26 27 28 29 30 31
 #define THUMBS 32 33 34 35 36 37
 
-// Mouse behavior tuning — quadratic accel: slow start for precision, ramps to full speed
+// Mouse behavior tuning — linear ramp: responsive start, full speed in 300ms
 &mmv {
-    time-to-max-speed-ms = <500>;
-    acceleration-exponent = <2>;
+    time-to-max-speed-ms = <300>;
+    acceleration-exponent = <1>;
 };
 
 &msc {
