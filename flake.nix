@@ -1,5 +1,5 @@
 {
-  description = "TOTEM split keyboard - firmware and reference app";
+  description = "TOTEM split keyboard — firmware, config, and tools";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -20,13 +20,19 @@
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
 
-        zmk-src = nixpkgs.lib.sourceFilesBySuffices (self + "/zmk") [ ".board" ".cmake" ".conf" ".defconfig" ".dts" ".dtsi" ".json" ".keymap" ".overlay" ".shield" ".yml" "_defconfig" ];
+        # ── ZMK firmware (Nix derivations) ──────────────────────────
+
+        zmk-src = nixpkgs.lib.sourceFilesBySuffices (self + "/zmk") [
+          ".board" ".cmake" ".conf" ".defconfig" ".dts" ".dtsi"
+          ".json" ".keymap" ".overlay" ".shield" ".yml" "_defconfig"
+        ];
 
         zmk-firmware = zmk-nix.legacyPackages.${system}.buildSplitKeyboard {
           name = "totem-zmk";
           src = zmk-src;
           board = "xiao_ble//zmk";
           shield = "totem_%PART%";
+          enableZmkStudio = true;
           zephyrDepsHash = "sha256-4LxcKpDKa93TOhoqvNmjxf1ZeHAFjV8hQYJaT/MjzT0=";
           meta = {
             description = "ZMK firmware for TOTEM split keyboard";
@@ -48,17 +54,21 @@
           };
         };
 
+        # ── Rust toolchain (for RMK + Tauri) ────────────────────────
+
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
           extensions = [ "rust-src" "rustfmt" "llvm-tools" ];
           targets = [ "thumbv7em-none-eabihf" ];
         };
 
-        firmware-script = pkgs.writeShellScriptBin "firmware" ''
+        # ── Shell scripts ────────────────────────────────────────────
+
+        rmk-script = pkgs.writeShellScriptBin "rmk" ''
           set -e
           ROOT="$(git rev-parse --show-toplevel)"
           BUILD="$ROOT/build"
           mkdir -p "$BUILD"
-          cd "$ROOT/firmware"
+          cd "$ROOT/rmk"
 
           uf2() {
             cargo objcopy --release --bin "$1" -- -O ihex "$BUILD/$2.hex"
@@ -67,7 +77,7 @@
 
           if [ "''${1:-}" = "--dongle" ]; then
             echo "=== Dongle mode (3 devices) ==="
-            echo "Building dongle (USB receiver, use_rust)..."
+            echo "Building dongle (USB receiver)..."
             cargo build --release --bin dongle
             echo "Building left half (peripheral 0)..."
             cargo build --release --bin dongle_peripheral
@@ -80,10 +90,9 @@
             uf2 dongle_peripheral2 totem-right
 
             echo ""
-            echo "UF2 files:"
-            echo "  build/totem-dongle.uf2  (USB dongle)"
-            echo "  build/totem-left.uf2    (left half)"
-            echo "  build/totem-right.uf2   (right half)"
+            echo "  → build/totem-dongle.uf2  (USB dongle)"
+            echo "  → build/totem-left.uf2    (left half)"
+            echo "  → build/totem-right.uf2   (right half)"
           else
             echo "=== Normal mode (left=central, right=peripheral) ==="
             echo "Building central (left half)..."
@@ -96,14 +105,12 @@
             uf2 peripheral totem-right
 
             echo ""
-            echo "UF2 files:"
-            echo "  build/totem-left.uf2   (central / left half)"
-            echo "  build/totem-right.uf2  (peripheral / right half)"
+            echo "  → build/totem-left.uf2   (central / left half)"
+            echo "  → build/totem-right.uf2  (peripheral / right half)"
           fi
 
           echo ""
-          echo "Flash via USB (double-tap reset to enter bootloader):"
-          echo "  cp build/totem-*.uf2 /run/media/\$USER/XIAO-SENSE/"
+          echo "Flash: cp build/totem-*.uf2 /run/media/$USER/XIAO-SENSE/"
         '';
 
         zmk-script = pkgs.writeShellScriptBin "zmk" ''
@@ -116,38 +123,53 @@
             echo "=== Downloading Adafruit bootloader for XIAO nRF52840 Sense ==="
             ${pkgs.curl}/bin/curl -fSL -o "$BUILD/xiao-bootloader-update.uf2" \
               "https://github.com/0hotpotman0/BLE_52840_Core/raw/main/bootloader/Seeed_XIAO_nRF52840_Sense/update-Seeed_XIAO_nRF52840_Sense_bootloader-0.6.1_nosd.uf2"
-            echo ""
-            echo "Bootloader update: build/xiao-bootloader-update.uf2"
-            echo "Flash via bootloader mode (double-tap reset):"
-            echo "  cp build/xiao-bootloader-update.uf2 /run/media/\$USER/XIAO-SENSE/"
+            echo "  → build/xiao-bootloader-update.uf2"
             exit 0
           fi
 
           if [ "''${1:-}" = "--reset" ]; then
             echo "=== Building ZMK settings reset ==="
-            nix build "$ROOT#zmk-settings-reset" --out-link "$BUILD/zmk-reset-result"
-            install -m 644 "$BUILD/zmk-reset-result/zmk.uf2" "$BUILD/totem-zmk-settings-reset.uf2"
-            rm "$BUILD/zmk-reset-result"
+            OUT=$(nix build "$ROOT#zmk-settings-reset" --no-link --print-out-paths)
+            install -m 644 "$OUT/zmk.uf2" "$BUILD/totem-zmk-settings-reset.uf2"
+            echo "  → build/totem-zmk-settings-reset.uf2"
             echo ""
-            echo "Flash this FIRST to clear stale data, then flash the real firmware:"
-            echo "  cp build/totem-zmk-settings-reset.uf2 /run/media/\$USER/XIAO-SENSE/"
+            echo "Flash this FIRST to clear stale data, then flash the real firmware."
             exit 0
           fi
 
           echo "=== Building ZMK firmware ==="
-          nix build "$ROOT#zmk" --out-link "$BUILD/zmk-result"
+          OUT=$(nix build "$ROOT#zmk" --no-link --print-out-paths)
+          install -m 644 "$OUT/zmk_left.uf2" "$BUILD/totem-zmk-left.uf2"
+          install -m 644 "$OUT/zmk_right.uf2" "$BUILD/totem-zmk-right.uf2"
 
-          install -m 644 "$BUILD/zmk-result/zmk_left.uf2" "$BUILD/totem-zmk-left.uf2"
-          install -m 644 "$BUILD/zmk-result/zmk_right.uf2" "$BUILD/totem-zmk-right.uf2"
-          rm "$BUILD/zmk-result"
+          echo "  → build/totem-zmk-left.uf2  (central / left half)"
+          echo "  → build/totem-zmk-right.uf2 (peripheral / right half)"
+          echo ""
+          echo "Flash: cp build/totem-zmk-*.uf2 /run/media/$USER/XIAO-SENSE/"
+        '';
 
+        sd-eraser-script = pkgs.writeShellScriptBin "sd-eraser" ''
+          set -e
+          ROOT="$(git rev-parse --show-toplevel)"
+          BUILD="$ROOT/build"
+          mkdir -p "$BUILD"
+          echo "=== Generating SoftDevice eraser ==="
+          ${pkgs.python3}/bin/python3 "$ROOT/tools/gen_sd_eraser.py" "$BUILD/sd_eraser.uf2"
+          echo "  → build/sd_eraser.uf2"
           echo ""
-          echo "UF2 files:"
-          echo "  build/totem-zmk-left.uf2   (central / left half)"
-          echo "  build/totem-zmk-right.uf2  (peripheral / right half)"
-          echo ""
-          echo "Flash via USB (double-tap reset to enter bootloader):"
-          echo "  cp build/totem-zmk-*.uf2 /run/media/\$USER/XIAO-SENSE/"
+          echo "Flash this to erase the SoftDevice region (0x1000-0x27000)."
+          echo "Required when switching from RMK v0.7+ back to ZMK."
+        '';
+
+        studio-script = pkgs.writeShellScriptBin "studio" ''
+          echo "Opening ZMK Studio..."
+          echo "Connect keyboard via USB first, then unlock in the web UI."
+          ${pkgs.xdg-utils}/bin/xdg-open "https://zmk.studio/"
+        '';
+
+        vial-script = pkgs.writeShellScriptBin "vial" ''
+          echo "Launching Vial..."
+          exec ${pkgs.vial}/bin/vial "$@"
         '';
 
         gui-script = pkgs.writeShellScriptBin "gui" ''
@@ -167,6 +189,7 @@
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            # Rust (RMK firmware + Tauri backend)
             rustToolchain
             cargo-make
             cargo-binutils
@@ -178,7 +201,7 @@
             # Build tools
             pkg-config
 
-            # For flashing
+            # Flashing
             probe-rs-tools
 
             # App (Tauri + Node.js)
@@ -198,14 +221,20 @@
             dbus
             udev
 
-            # Debugging
-            picocom # Serial console
+            # Keyboard tools
+            vial
+            xdg-utils
 
+            # Debugging
+            picocom
           ];
 
           packages = [
-            firmware-script
+            rmk-script
             zmk-script
+            sd-eraser-script
+            studio-script
+            vial-script
             gui-script
           ];
 
@@ -213,13 +242,22 @@
           BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.lib.getVersion pkgs.llvmPackages.clang}/include";
 
           shellHook = ''
-            echo "TOTEM development environment"
-            echo "  firmware           - build RMK normal mode (left=central, right=peripheral)"
-            echo "  firmware --dongle  - build RMK dongle mode (dongle + left + right)"
-            echo "  zmk                - build ZMK firmware → build/totem-zmk-{left,right}.uf2"
-            echo "  zmk --bootloader   - download XIAO nRF52840 Sense bootloader"
-            echo "  zmk --reset        - build ZMK settings reset firmware"
-            echo "  gui                - launch GUI dev server"
+            echo "TOTEM keyboard development environment"
+            echo ""
+            echo "  Build:"
+            echo "    rmk              Build RMK firmware (left + right)"
+            echo "    rmk --dongle     Build RMK dongle mode (dongle + left + right)"
+            echo "    zmk              Build ZMK firmware (left + right)"
+            echo "    zmk --reset      Build ZMK settings reset"
+            echo "    zmk --bootloader Download XIAO nRF52840 bootloader"
+            echo "    sd-eraser        Generate SoftDevice eraser UF2"
+            echo ""
+            echo "  Tools:"
+            echo "    gui              Run TOTEM GUI (Tauri dev server)"
+            echo "    studio           Open ZMK Studio (web)"
+            echo "    vial             Launch Vial GUI"
+            echo ""
+            echo "  All outputs → build/"
           '';
         };
       }

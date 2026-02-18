@@ -24,6 +24,7 @@
 / {
     chosen {
         zmk,kscan = &kscan0;
+        zmk,physical-layout = &totem_layout;
     };
 
     default_transform: keymap_transform_0 {

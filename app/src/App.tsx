@@ -8,7 +8,7 @@ import { parseKeyboardConfig } from "./lib/parseKeyboard";
 import { resolveKeyLabel, LAYER_NAMES, type KeyLabel } from "./lib/keyLabels";
 import { resolveQmkKeycode } from "./lib/qmkKeycodes";
 import { KEYPOS_TO_MATRIX } from "./lib/keyposMap";
-import keyboardToml from "@firmware/keyboard.toml";
+import keyboardToml from "@rmk/keyboard.toml";
 
 const tomlKeyboard = parseKeyboardConfig(keyboardToml);
 

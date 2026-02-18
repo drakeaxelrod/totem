@@ -1,8 +1,4 @@
-.direnv
-result
-.claude
-zmk-firmware/flake.lock
-zmk-firmware/build/
-rmk-firmware/build/
+.direnv/
+.claude/
 build/
-result
+result/
