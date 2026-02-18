@@ -5,3 +5,4 @@ zmk-firmware/flake.lock
 zmk-firmware/build/
 rmk-firmware/build/
 build/
+result

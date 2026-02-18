@@ -1,6 +1,22 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include "totem-layout.dtsi"
 
+/* Override flash partitions: remove SoftDevice, app starts at 0x1000.
+ * RMK v0.7+ erased the pre-flashed SoftDevice when it moved to 0x1000.
+ * Without this override ZMK targets 0x27000 and Zephyr's BLE controller
+ * crashes on the corrupted SoftDevice remnants. */
+&flash0 {
+	partitions {
+		/delete-node/ partition@1000;
+		/delete-node/ partition@27000;
+
+		code_partition: partition@1000 {
+			label = "code_partition";
+			reg = <0x00001000 0x000ec000>;
+		};
+	};
+};
+
 &totem_layout {
     transform = <&default_transform>;
 };

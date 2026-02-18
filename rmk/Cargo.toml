@@ -70,8 +70,16 @@ name = "peripheral"
 path = "src/peripheral.rs"
 
 [[bin]]
-name = "peripheral2"
-path = "src/peripheral2.rs"
+name = "dongle"
+path = "src/dongle.rs"
+
+[[bin]]
+name = "dongle_peripheral"
+path = "src/dongle_peripheral.rs"
+
+[[bin]]
+name = "dongle_peripheral2"
+path = "src/dongle_peripheral2.rs"
 
 [profile.dev]
 codegen-units = 1      # better optimizations

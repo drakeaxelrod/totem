@@ -1,0 +1,9 @@
+# RMK build-time constants — all runtime config is in Rust (use_rust approach)
+# See: keymap.rs, behavior.rs, central.rs, dongle.rs, peripheral.rs
+[rmk]
+combo_max_num = 32
+mouse_key_interval = 10
+mouse_wheel_interval = 50
+# Always 2: dongle needs 2, normal mode wastes 1 connection slot (harmless)
+# This sets CONNECTIONS_MAX = 3 (2 peripherals + 1 BLE HID)
+split_peripherals_num = 2
