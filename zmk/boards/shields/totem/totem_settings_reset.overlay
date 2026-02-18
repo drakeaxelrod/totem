@@ -1,0 +1,27 @@
+// TOTEM settings reset — clears all ZMK settings + BLE bonds
+// Uses our custom flash partition (code at 0x1000) so it actually boots
+
+&flash0 {
+	partitions {
+		/delete-node/ partition@1000;
+		/delete-node/ partition@27000;
+
+		code_partition: partition@1000 {
+			label = "code_partition";
+			reg = <0x00001000 0x000ec000>;
+		};
+	};
+};
+
+/ {
+    chosen {
+        zmk,kscan = &mock_kscan;
+    };
+
+    mock_kscan: mock_kscan_0 {
+        compatible = "zmk,kscan-mock";
+        columns = <0>;
+        rows = <0>;
+        events = <0>;
+    };
+};

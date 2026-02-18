@@ -41,14 +41,30 @@
           };
         };
 
+        zmk-dongle-firmware = zmk-nix.legacyPackages.${system}.buildSplitKeyboard {
+          name = "totem-zmk-dongle";
+          src = zmk-src;
+          board = "xiao_ble//zmk";
+          shield = "totem_dongle_%PART%";
+          parts = ["central" "left" "right"];
+          centralPart = "central";
+          enableZmkStudio = true;
+          zephyrDepsHash = "sha256-sCIbjeRbmKivNQQB4O/E7Hd/1mwfhhLPQTPWE6vADco=";
+          meta = {
+            description = "ZMK dongle firmware for TOTEM split keyboard";
+            license = nixpkgs.lib.licenses.mit;
+            platforms = nixpkgs.lib.platforms.all;
+          };
+        };
+
         zmk-settings-reset = zmk-nix.legacyPackages.${system}.buildKeyboard {
           name = "totem-zmk-settings-reset";
           src = zmk-src;
           board = "xiao_ble//zmk";
-          shield = "settings_reset";
-          zephyrDepsHash = "sha256-j5bWsbcAkEs0SHL47KkIBBEbaooejXb9V6K1bVieHqc=";
+          shield = "totem_settings_reset";
+          zephyrDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
           meta = {
-            description = "ZMK settings reset for TOTEM";
+            description = "ZMK settings reset for TOTEM (boots from 0x1000)";
             license = nixpkgs.lib.licenses.mit;
             platforms = nixpkgs.lib.platforms.all;
           };
@@ -137,6 +153,22 @@
             exit 0
           fi
 
+          if [ "''${1:-}" = "--dongle" ]; then
+            echo "=== Building ZMK dongle firmware (3 devices) ==="
+            OUT=$(nix build "$ROOT#zmk-dongle" --no-link --print-out-paths)
+            install -m 644 "$OUT/zmk_central.uf2" "$BUILD/totem-zmk-dongle.uf2"
+            install -m 644 "$OUT/zmk_left.uf2" "$BUILD/totem-zmk-dongle-left.uf2"
+            install -m 644 "$OUT/zmk_right.uf2" "$BUILD/totem-zmk-dongle-right.uf2"
+
+            echo "  → build/totem-zmk-dongle.uf2       (USB dongle)"
+            echo "  → build/totem-zmk-dongle-left.uf2  (left half)"
+            echo "  → build/totem-zmk-dongle-right.uf2 (right half)"
+            echo ""
+            echo "Flash settings_reset on ALL 3 devices first, then flash the real firmware."
+            echo "Flash: cp build/totem-zmk-dongle*.uf2 /run/media/$USER/XIAO-SENSE/"
+            exit 0
+          fi
+
           echo "=== Building ZMK firmware ==="
           OUT=$(nix build "$ROOT#zmk" --no-link --print-out-paths)
           install -m 644 "$OUT/zmk_left.uf2" "$BUILD/totem-zmk-left.uf2"
@@ -164,6 +196,11 @@
         studio-script = pkgs.writeShellScriptBin "studio" ''
           echo "Opening ZMK Studio..."
           echo "Connect keyboard via USB first, then unlock in the web UI."
+          for browser in chromium google-chrome-stable brave microsoft-edge; do
+            if command -v "$browser" &>/dev/null; then
+              exec "$browser" --app="https://zmk.studio/"
+            fi
+          done
           ${pkgs.xdg-utils}/bin/xdg-open "https://zmk.studio/"
         '';
 
@@ -184,6 +221,7 @@
       in
       {
         packages.zmk = zmk-firmware;
+        packages.zmk-dongle = zmk-dongle-firmware;
         packages.zmk-settings-reset = zmk-settings-reset;
         packages.zmk-flash = zmk-nix.packages.${system}.flash.override { firmware = zmk-firmware; };
 
@@ -248,6 +286,7 @@
             echo "    rmk              Build RMK firmware (left + right)"
             echo "    rmk --dongle     Build RMK dongle mode (dongle + left + right)"
             echo "    zmk              Build ZMK firmware (left + right)"
+            echo "    zmk --dongle     Build ZMK dongle mode (dongle + left + right)"
             echo "    zmk --reset      Build ZMK settings reset"
             echo "    zmk --bootloader Download XIAO nRF52840 bootloader"
             echo "    sd-eraser        Generate SoftDevice eraser UF2"

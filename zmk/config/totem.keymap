@@ -1,5 +1,5 @@
 // TOTEM Gallium layout — ported from RMK firmware (keymap.rs + behavior.rs)
-// Home row mods (GACS), 29 combos, 2 mod-morphs, mouse keys, caps word
+// Home row mods (GACS), 33 combos, 2 mod-morphs, 1 macro, mouse keys, caps word
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
@@ -27,10 +27,10 @@
 #define KEYS_R 5 6 7 8 9 15 16 17 18 19 26 27 28 29 30 31
 #define THUMBS 32 33 34 35 36 37
 
-// Mouse behavior tuning
+// Mouse behavior tuning — quadratic accel: slow start for precision, ramps to full speed
 &mmv {
-    time-to-max-speed-ms = <400>;
-    acceleration-exponent = <1>;
+    time-to-max-speed-ms = <500>;
+    acceleration-exponent = <2>;
 };
 
 &msc {
@@ -88,6 +88,15 @@
             mods = <(MOD_LSFT|MOD_RSFT)>;
         };
 
+        // ── Macro: Fat Arrow => ──
+        fat_arrow: fat_arrow {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&kp EQUAL &kp GT>;
+        };
+
         // ── Mod-Morph: Dot / Colon ──
         // Normal: .  |  Shifted: : (shift suppressed, COLON = LS(SEMI))
         dot_morph: dot_colon {
@@ -99,19 +108,21 @@
     };
 
     // ══════════════════════════════════════════════════════════════
-    // Combos — 29 total, all 80ms timeout, BASE layer only
+    // Combos — 33 total, all 80ms timeout, BASE layer only
     // ══════════════════════════════════════════════════════════════
 
     combos {
         compatible = "zmk,combos";
 
-        // ─── Left vertical: top + home → @ # $ % ───
+        // ─── Left vertical: top + home → ! @ # $ % ───
+        combo_excl  { timeout-ms = <80>; key-positions = <0 10>;  bindings = <&kp EXCL>;  layers = <BASE>; };
         combo_at    { timeout-ms = <80>; key-positions = <1 11>;  bindings = <&kp AT>;    layers = <BASE>; };
         combo_hash  { timeout-ms = <80>; key-positions = <2 12>;  bindings = <&kp HASH>;  layers = <BASE>; };
         combo_dllr  { timeout-ms = <80>; key-positions = <3 13>;  bindings = <&kp DLLR>;  layers = <BASE>; };
         combo_prcnt { timeout-ms = <80>; key-positions = <4 14>;  bindings = <&kp PRCNT>; layers = <BASE>; };
 
-        // ─── Left vertical: home + bottom → ` \ = ~ ───
+        // ─── Left vertical: home + bottom → ? ` \ = ~ ───
+        combo_qmark { timeout-ms = <80>; key-positions = <10 21>; bindings = <&kp QMARK>; layers = <BASE>; };
         combo_grave { timeout-ms = <80>; key-positions = <11 22>; bindings = <&kp GRAVE>; layers = <BASE>; };
         combo_bslh  { timeout-ms = <80>; key-positions = <12 23>; bindings = <&kp BSLH>;  layers = <BASE>; };
         combo_equal { timeout-ms = <80>; key-positions = <13 24>; bindings = <&kp EQUAL>; layers = <BASE>; };
@@ -129,11 +140,13 @@
         combo_star  { timeout-ms = <80>; key-positions = <7 17>;  bindings = <&kp STAR>;  layers = <BASE>; };
         combo_amps  { timeout-ms = <80>; key-positions = <8 18>;  bindings = <&kp AMPS>;  layers = <BASE>; };
 
-        // ─── Right vertical: home + bottom → _ - / | ───
+        // ─── Right vertical: home + bottom → _ - / | " => ───
         combo_under { timeout-ms = <80>; key-positions = <15 26>; bindings = <&kp UNDER>; layers = <BASE>; };
         combo_minus { timeout-ms = <80>; key-positions = <16 27>; bindings = <&kp MINUS>; layers = <BASE>; };
         combo_fslh  { timeout-ms = <80>; key-positions = <17 28>; bindings = <&kp FSLH>;  layers = <BASE>; };
         combo_pipe  { timeout-ms = <80>; key-positions = <18 29>; bindings = <&kp PIPE>;  layers = <BASE>; };
+        combo_dqt   { timeout-ms = <80>; key-positions = <29 19>; bindings = <&kp DQT>;   layers = <BASE>; };
+        combo_arrow { timeout-ms = <80>; key-positions = <30 19>; bindings = <&fat_arrow>; layers = <BASE>; };
 
         // ─── Right horizontal: brackets ───
         combo_lbkt  { timeout-ms = <80>; key-positions = <6 7>;   bindings = <&kp LBKT>;  layers = <BASE>; };

@@ -1,0 +1,2 @@
+// Dongle uses the same keymap as the standard build
+#include "totem.keymap"
