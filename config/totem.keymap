@@ -438,10 +438,10 @@
         fun_layer {
             display-name = "FUN";
             bindings = <
-       &kp F12  &kp F7  &kp F8  &kp F9  &none    &kp PSCRN        &kp C_VOL_DN  &kp C_VOL_UP  &kp C_MUTE  &kp SLCK
-       &kp F11  &kp F4  &kp F5  &kp F6  &none    &none            &kp LSHFT     &kp LCTRL     &kp LALT    &kp LGUI
-&none  &kp F10  &kp F1  &kp F2  &kp F3  &none    &kp PAUSE_BREAK  &kp C_BRI_DN  &kp C_BRI_UP  &none       &none     &tog GAME
-                        &none   &none   &none    &kp C_PP         &kp C_PREV    &kp C_NEXT
+        &kp F12  &kp F7  &kp F8  &kp F9  &kp F10    &kp PSCRN        &kp C_VOL_DN  &kp C_VOL_UP  &kp C_MUTE  &kp SLCK
+        &kp F11  &kp F4  &kp F5  &kp F6  &kp F11    &trans           &kp LSHFT     &kp LCTRL     &kp LALT    &kp LGUI
+&trans  &trans   &kp F1  &kp F2  &kp F3  &kp F12    &kp PAUSE_BREAK  &kp C_BRI_DN  &kp C_BRI_UP  &trans      &trans    &tog GAME
+                         &trans  &trans  &trans     &kp C_PP         &kp C_PREV    &kp C_NEXT
             >;
         };
 
