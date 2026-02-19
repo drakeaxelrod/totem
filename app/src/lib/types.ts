@@ -1,5 +1,27 @@
 // ── Shared types for the TOTEM keyboard configurator ─────────────────
 
+// ── Device & connection ─────────────────────────────────────────────
+
+export interface DeviceInfo {
+  id: string;
+  name: string;
+  transport: "Usb" | "Ble";
+}
+
+export interface ConnectedDeviceInfo {
+  name: string;
+  serial_number: string;
+  transport: "Usb" | "Ble";
+}
+
+export type ConnectionStatus =
+  | { state: "disconnected" }
+  | { state: "scanning" }
+  | { state: "connecting"; device: DeviceInfo }
+  | { state: "connected"; info: ConnectedDeviceInfo; locked: boolean };
+
+// ── Binding ─────────────────────────────────────────────────────────
+
 export interface Binding {
   action: string;
   params: string[];

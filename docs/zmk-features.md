@@ -26,10 +26,10 @@ ZMK has 31 distinct behaviors. The TOTEM configurator supports assigning all STU
 | Hold-Tap | `&ht` | LIVE (assign) / FW (create) | Full | Custom `hml`/`hmr` flavors; BehaviorEditor supports all params (flavor, tapping-term, quick-tap, require-prior-idle, retro-tap, hold-trigger-key-positions, hold-trigger-on-release) |
 | Mod-Tap | `&mt` | LIVE | Full | Pre-defined hold-tap: modifier on hold, keycode on tap. Default flavor: hold-preferred |
 | Layer-Tap (TOTEM) | `&lt_th` | LIVE | Full | Custom TOTEM thumb layer-tap |
-| Layer-Tap (generic) | `&lt` | LIVE | Display | Pre-defined hold-tap: layer on hold, keycode on tap. Default flavor: tap-preferred. Not in action picker |
-| Key Toggle | `&kt` | LIVE | None | Toggles key press state (press if unpressed, release if pressed). Supports `toggle-mode`: on/off |
+| Layer-Tap (generic) | `&lt` | LIVE | Full | Pre-defined hold-tap: layer on hold, keycode on tap. Default flavor: tap-preferred |
+| Key Toggle | `&kt` | LIVE | Full | Toggles key press state (press if unpressed, release if pressed). In action picker with keycode grid |
 | Sticky Key | `&sk` | LIVE | Full | One-shot modifier. Config: release-after-ms (1000), quick-release, lazy, ignore-modifiers |
-| Sticky Layer | `&sl` | LIVE | Display | One-shot layer. Parsed and shown but not in action picker |
+| Sticky Layer | `&sl` | LIVE | Full | One-shot layer. In action picker with layer selector |
 | Transparent | `&trans` | LIVE | Full | Pass-through to next active layer |
 | None | `&none` | LIVE | Full | Block/swallow key events |
 
@@ -39,7 +39,7 @@ ZMK has 31 distinct behaviors. The TOTEM configurator supports assigning all STU
 |---------|-------------|--------|--------|-------|
 | Momentary Layer | `&mo` | LIVE | Full | Enable layer while held |
 | Layer Toggle | `&tog` | LIVE | Full | Toggle layer on/off. Supports `toggle-mode`: on/off |
-| To Layer | `&to` | LIVE | Display | Enable target layer, disable all others except default. Not in action picker |
+| To Layer | `&to` | LIVE | Full | Enable target layer, disable all others except default. In action picker with layer selector |
 | Conditional Layer | `&conditional_layer` | PLANNED | Display | Auto-activate layer when all source layers active. Parsed only |
 
 ### Advanced Behaviors
@@ -49,9 +49,9 @@ ZMK has 31 distinct behaviors. The TOTEM configurator supports assigning all STU
 | Caps Word | `&caps_word` | LIVE | Full | Auto-deactivates on non-continue-list key. Config: continue-list, mods |
 | Key Repeat | `&key_repeat` | LIVE | Full | Sends last keycode again. Config: usage-pages (add HID_USAGE_CONSUMER for media) |
 | Mod-Morph | `&mod_morph` | LIVE (assign) / FW (create) | Display | Different behavior when modifier held. Config: mods (bitmask), keep-mods, bindings. BehaviorEditor shows read-only |
-| Tap Dance | `&td` | LIVE (assign) / PLANNED (create) | Display | Different behavior per tap count. Config: tapping-term-ms (200), bindings list. No editor |
+| Tap Dance | `&td` | LIVE (assign) / PLANNED (create) | Full | Different behavior per tap count. Config: tapping-term-ms (200), bindings list. BehaviorEditor: tapping-term editable, bindings shown |
 | Macro | `&macro` | LIVE (assign) / PLANNED (create) | Display | Execute behavior sequence. Controls: macro_tap/press/release/pause_for_release. Timing: wait-ms (15), tap-ms (30). Supports 0/1/2 params. BehaviorEditor shows timing, bindings read-only |
-| Grave Escape | `&gresc` | LIVE | Display | Built-in mod-morph: Esc normally, \` with Shift/GUI. Not in action picker |
+| Grave Escape | `&gresc` | LIVE | Full | Built-in mod-morph: Esc normally, \` with Shift/GUI. In action picker (no-param) |
 | Sensor Rotation | `&inc_dec_kp` | N/A | None | Encoder CW/CCW bindings. Standard and variable variants. Used in `sensor-bindings` |
 
 ### System Behaviors
@@ -60,7 +60,7 @@ ZMK has 31 distinct behaviors. The TOTEM configurator supports assigning all STU
 |---------|-------------|--------|--------|-------|
 | Bootloader | `&bootloader` | LIVE | Full | Reset into bootloader for flashing. Split: affects only the half where bound |
 | System Reset | `&sys_reset` | LIVE | Full | Soft-reset running firmware. Split: affects only the half where bound |
-| Soft Off | `&soft_off` | LIVE | Display | Power down keyboard. Config: hold-time-ms, split-peripheral-off-on-press. Requires `CONFIG_ZMK_PM_SOFT_OFF=y` |
+| Soft Off | `&soft_off` | LIVE | Full | Power down keyboard. In action picker (no-param). Config: hold-time-ms, split-peripheral-off-on-press. Requires `CONFIG_ZMK_PM_SOFT_OFF=y` |
 | External Power | `&ext_power` | LIVE | Full | EP_ON, EP_OFF, EP_TOG. Controls VCC to peripherals. Global (both halves). Persisted to flash |
 | ZMK Studio Unlock | `&studio_unlock` | LIVE | Full | Grant Studio permission to modify settings. Auto-relocks on inactivity/disconnect |
 
@@ -69,11 +69,11 @@ ZMK has 31 distinct behaviors. The TOTEM configurator supports assigning all STU
 | Feature | ZMK Behavior | Studio | Status | Notes |
 |---------|-------------|--------|--------|-------|
 | Bluetooth Select | `&bt BT_SEL n` | LIVE | Full | Select profile by 0-based index (0-4) |
-| Bluetooth Next | `&bt BT_NXT` | LIVE | None | Next profile (wraps around) |
-| Bluetooth Previous | `&bt BT_PRV` | LIVE | None | Previous profile (wraps around) |
+| Bluetooth Next | `&bt BT_NXT` | LIVE | Full | Next profile (wraps around) |
+| Bluetooth Previous | `&bt BT_PRV` | LIVE | Full | Previous profile (wraps around) |
 | Bluetooth Clear | `&bt BT_CLR` | LIVE | Full | Clear current profile bond |
 | Bluetooth Clear All | `&bt BT_CLR_ALL` | LIVE | Full | Clear all profile bonds |
-| Bluetooth Disconnect | `&bt BT_DISC n` | LIVE | None | Disconnect specific profile by index |
+| Bluetooth Disconnect | `&bt BT_DISC n` | LIVE | Full | Disconnect specific profile by index. Profile selector (0-4) |
 | Output Toggle | `&out OUT_TOG` | LIVE | Full | Toggle USB/BLE. Persisted to flash |
 | Output USB | `&out OUT_USB` | LIVE | Full | Force USB output |
 | Output BLE | `&out OUT_BLE` | LIVE | Full | Force BLE output |
@@ -109,8 +109,8 @@ Requires `CONFIG_ZMK_POINTING=y`.
 | Timeout (ms) | Full | Editable numeric field (default 50ms) |
 | Layer filter | Full | Multi-select layer checkboxes |
 | Add/delete/duplicate | Full | Context menu + bottom button |
-| `require-prior-idle-ms` | None | Prevents false triggers during fast typing. Parsed but no UI |
-| `slow-release` | None | Maintain binding until ALL keys released. Not parsed |
+| `require-prior-idle-ms` | Full | Checkbox + number input in ComboEditor (default 150ms) |
+| `slow-release` | Full | Checkbox toggle in ComboEditor |
 
 Max simultaneous: `CONFIG_ZMK_COMBO_MAX_PRESSED_COMBOS` (default 4).
 
@@ -222,16 +222,16 @@ Queue size: `CONFIG_ZMK_BEHAVIORS_QUEUE_SIZE` (default 64).
 
 | Parameter | Status | Notes |
 |-----------|--------|-------|
-| `tapping-term-ms` | None | Default 200ms. Max time between taps |
-| `bindings` | None | Ordered array of behaviors per tap count |
+| `tapping-term-ms` | Full | BehaviorEditor numeric field. Default 200ms |
+| `bindings` | Display | Ordered list shown in BehaviorEditor (read-only) |
 
 ### Combo Config
 
 | Parameter | Status | Notes |
 |-----------|--------|-------|
 | `timeout-ms` | Full | Default 50ms |
-| `require-prior-idle-ms` | None | Default -1 (disabled). Prevents false triggers |
-| `slow-release` | None | Maintain until ALL keys released |
+| `require-prior-idle-ms` | Full | Default -1 (disabled). Checkbox + ms input in ComboEditor |
+| `slow-release` | Full | Checkbox toggle in ComboEditor |
 | `layers` | Full | Multi-select in ComboEditor |
 
 ### Mod-Morph Config
@@ -285,8 +285,8 @@ Requires `CONFIG_ZMK_POINTING=y` (enabled in totem.conf).
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Mouse emulation keys | Full | `&mmv`, `&msc`, `&mkp` behaviors fully supported |
-| Mouse config (move speed) | Display | `MouseConfig` type defined, values parsed, no UI editor |
-| Mouse config (scroll speed) | Display | Same |
+| Mouse config (move speed) | Full | MouseConfigEditor sidebar tab with speed, time-to-max, accel fields |
+| Mouse config (scroll speed) | Full | Same editor, scroll section |
 | Smooth scrolling | None | `CONFIG_ZMK_SMOOTH_SCROLLING` (HID Resolution Multipliers) |
 | Trackball/trackpad | None | Hardware-specific (e.g., Cirque Pinnacle). Requires SPI/I2C drivers |
 
@@ -465,23 +465,22 @@ Modify events from pointing devices and mouse emulation. Defined in devicetree.
 ## Priority Implementation Targets
 
 ### High Priority (commonly used features missing editing)
-- [ ] Tap dance editor (define tap sequences with bindings)
 - [ ] Mod-morph editor (edit normal/shifted bindings + mods bitmask + keep-mods)
 - [ ] Macro editor (visual step builder: tap/press/release, timing, parameter forwarding)
-- [ ] Generic `&lt` in action picker
-- [ ] `&sl` (sticky layer) in action picker
-- [ ] `&to` (to layer) in action picker
-- [ ] `&soft_off` in action picker
-- [ ] `&gresc` (grave escape) in action picker
-- [ ] `&kt` (key toggle) behavior support
-- [ ] `&bt BT_NXT` / `BT_PRV` / `BT_DISC` in action picker
-- [ ] Combo `require-prior-idle-ms` UI control
-- [ ] Combo `slow-release` UI control
+- [x] ~~Generic `&lt` in action picker~~
+- [x] ~~`&sl` (sticky layer) in action picker~~
+- [x] ~~`&to` (to layer) in action picker~~
+- [x] ~~`&soft_off` in action picker~~
+- [x] ~~`&gresc` (grave escape) in action picker~~
+- [x] ~~`&kt` (key toggle) in action picker~~
+- [x] ~~`&bt BT_NXT` / `BT_PRV` / `BT_DISC` in action picker~~
+- [x] ~~Combo `require-prior-idle-ms` UI control~~
+- [x] ~~Combo `slow-release` UI control~~
+- [x] ~~Tap dance parsing + BehaviorEditor (tapping-term editable)~~
+- [x] ~~Mouse config editor~~
 
 ### Medium Priority (power user features)
-- [ ] Encoder/sensor binding editor (per-layer `sensor-bindings`)
 - [ ] Layer reordering (drag-and-drop)
-- [ ] Mouse config editor (move speed, scroll speed, acceleration)
 - [ ] RGB underglow control editor (all commands + HSB color picker)
 - [ ] Backlight control editor
 - [ ] Combo editing via ZMK Studio protocol (when firmware supports it)

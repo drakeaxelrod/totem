@@ -3,8 +3,9 @@ import {
   KEYCODES,
   CATEGORY_LABELS,
   ALL_KEYCODES,
-  ACTIONS,
   ACTION_LABELS,
+  ACTION_DESCRIPTIONS,
+  ACTION_GROUPS,
   NO_PARAM_ACTIONS,
   HOLD_TAP_ACTIONS,
 } from "../lib/keycodes.ts";
@@ -336,22 +337,32 @@ export function BindingPicker({ binding, position, layerNames, onSave, onClose }
 
         {/* Body */}
         <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-          {/* Action selector */}
-          <div class="flex flex-col gap-1.5">
+          {/* Action selector — grouped */}
+          <div class="flex flex-col gap-2">
             <label class="text-xs text-subtext font-medium">Action</label>
-            <div class="flex flex-wrap gap-1">
-              {ACTIONS.map((a) => (
-                <button
-                  key={a}
-                  class={`px-2 py-1 rounded text-xs transition-colors
-                    ${a === action
-                      ? "bg-primary text-surface"
-                      : "bg-surface text-subtext hover:text-text hover:bg-overlay/30"}`}
-                  onClick={() => handleActionChange(a)}
-                >
-                  {ACTION_LABELS[a]}
-                </button>
-              ))}
+            {ACTION_GROUPS.map((group) => (
+              <div key={group.label} class="flex flex-col gap-1">
+                <span class="text-[10px] text-subtext/60 uppercase tracking-wider">{group.label}</span>
+                <div class="flex flex-wrap gap-1">
+                  {group.actions.map((a) => (
+                    <button
+                      key={a}
+                      class={`px-2 py-1 rounded text-xs transition-colors
+                        ${a === action
+                          ? "bg-primary text-surface"
+                          : "bg-surface text-subtext hover:text-text hover:bg-overlay/30"}`}
+                      onClick={() => handleActionChange(a)}
+                      title={ACTION_DESCRIPTIONS[a]}
+                    >
+                      {ACTION_LABELS[a]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {/* Description of selected action */}
+            <div class="text-xs text-subtext/80 italic">
+              {ACTION_DESCRIPTIONS[action]}
             </div>
           </div>
 
@@ -512,11 +523,21 @@ function ActionParams({
     );
   }
 
-  // Output toggle
+  // Output selection
   if (action === "out") {
+    const options = [
+      { label: "Toggle", value: "OUT_TOG" },
+      { label: "USB", value: "OUT_USB" },
+      { label: "Bluetooth", value: "OUT_BLE" },
+    ];
     return (
-      <div class="text-sm text-subtext italic">
-        Toggles between USB and Bluetooth output.
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs text-subtext font-medium">Output Mode</label>
+        <PillSelect
+          options={options}
+          value={params[0] ?? "OUT_TOG"}
+          onChange={(v) => setParams([v])}
+        />
       </div>
     );
   }

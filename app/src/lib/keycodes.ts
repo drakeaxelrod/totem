@@ -18,6 +18,11 @@ export const KEYCODES = {
     "C_BRI_UP","C_BRI_DN","C_PLAY_PAUSE",
   ],
   mouse: ["LCLK","RCLK","MCLK","MB4","MB5"],
+  international: [
+    "NON_US_HASH","NON_US_BSLH",
+    "INT1","INT2","INT3","INT4","INT5","INT6","INT7","INT8","INT9",
+    "LANG1","LANG2","LANG3","LANG4","LANG5","LANG6","LANG7","LANG8","LANG9",
+  ],
 } as const;
 
 export type KeycodeCategory = keyof typeof KEYCODES;
@@ -32,6 +37,7 @@ export const CATEGORY_LABELS: Record<KeycodeCategory, string> = {
   symbols: "Symbols",
   media: "Media",
   mouse: "Mouse",
+  international: "International",
 };
 
 export const ALL_KEYCODES: string[] = Object.values(KEYCODES).flat();
@@ -40,51 +46,131 @@ export const ACTIONS = [
   "kp", "hml", "hmr", "lt_th", "lt", "mt", "trans", "none",
   "bt", "out", "tog", "mo", "sl", "to", "mmv", "msc", "mkp",
   "comma_morph", "dot_morph", "caps_word", "fat_arrow",
-  "sk", "kt", "key_repeat", "gresc", "soft_off",
+  "sk", "kt", "td", "key_repeat", "gresc", "soft_off",
   "bootloader", "sys_reset", "ext_power", "studio_unlock",
 ] as const;
 
 export type Action = (typeof ACTIONS)[number];
 
 export const ACTION_LABELS: Record<Action, string> = {
+  // Key behaviors
   kp: "Key Press",
-  hml: "Home Row Mod (L)",
-  hmr: "Home Row Mod (R)",
-  lt_th: "Layer Tap (Thumb)",
-  lt: "Layer Tap",
-  mt: "Mod Tap",
-  trans: "Transparent",
-  none: "None",
-  bt: "Bluetooth",
-  out: "Output",
-  tog: "Layer Toggle",
-  mo: "Momentary Layer",
-  sl: "Sticky Layer",
-  to: "To Layer",
-  mmv: "Mouse Move",
-  msc: "Mouse Scroll",
-  mkp: "Mouse Button",
-  comma_morph: "Comma Morph",
-  dot_morph: "Dot Morph",
-  caps_word: "Caps Word",
-  fat_arrow: "Fat Arrow",
+  mt: "Mod-Tap",
+  lt: "Layer-Tap",
   sk: "Sticky Key",
   kt: "Key Toggle",
-  key_repeat: "Key Repeat",
   gresc: "Grave Escape",
+  caps_word: "Caps Word",
+  key_repeat: "Key Repeat",
+  td: "Tap Dance",
+  // Custom hold-taps
+  hml: "HRM Left",
+  hmr: "HRM Right",
+  lt_th: "Layer-Tap Thumb",
+  // Layer control
+  mo: "Momentary",
+  tog: "Toggle",
+  sl: "Sticky Layer",
+  to: "To Layer",
+  trans: "Transparent",
+  none: "None",
+  // Mouse
+  mmv: "Move",
+  msc: "Scroll",
+  mkp: "Click",
+  // Wireless
+  bt: "Bluetooth",
+  out: "Output",
+  // Custom behaviors
+  comma_morph: ", → ;",
+  dot_morph: ". → :",
+  fat_arrow: "=> Macro",
+  // System
   soft_off: "Soft Off",
   bootloader: "Bootloader",
-  sys_reset: "System Reset",
+  sys_reset: "Reset",
   ext_power: "Ext Power",
   studio_unlock: "Studio Unlock",
 };
+
+/** Short descriptions for each action, shown in the picker */
+export const ACTION_DESCRIPTIONS: Record<Action, string> = {
+  kp: "Send a keycode when pressed",
+  mt: "Hold: modifier — Tap: keycode",
+  lt: "Hold: activate layer — Tap: keycode",
+  sk: "One-shot modifier — applies to the next keypress only",
+  kt: "Press to toggle a key on, press again to toggle off",
+  gresc: "Tap: Escape — With Shift/GUI held: ` ~",
+  caps_word: "Capitalizes the next word, then auto-disables",
+  key_repeat: "Repeats whatever key was last pressed",
+  td: "Different action for single, double, or triple tap",
+  hml: "Positional hold-tap — hold triggers only on right-hand keys",
+  hmr: "Positional hold-tap — hold triggers only on left-hand keys",
+  lt_th: "Layer-tap tuned for thumb keys (faster activation)",
+  mo: "Activate layer while held, deactivate on release",
+  tog: "Toggle layer on/off with each press",
+  sl: "Activate layer for just the next keypress",
+  to: "Switch to layer permanently until another &to",
+  trans: "Transparent — falls through to the layer below",
+  none: "Blocks key completely — no action at all",
+  mmv: "Move the mouse cursor in a direction",
+  msc: "Scroll the mouse wheel in a direction",
+  mkp: "Press a mouse button (left, right, middle, etc.)",
+  bt: "Bluetooth profile switching, pairing, and clearing",
+  out: "Select output: USB, Bluetooth, or toggle between them",
+  comma_morph: "Normal: comma (,) — Shifted: semicolon (;)",
+  dot_morph: "Normal: period (.) — Shifted: colon (:)",
+  fat_arrow: "Macro that types => (equal sign + greater than)",
+  soft_off: "Put the keyboard into deep sleep",
+  bootloader: "Enter USB firmware flash mode (DFU/UF2)",
+  sys_reset: "Reset the keyboard microcontroller",
+  ext_power: "Control external power output (LEDs, etc.)",
+  studio_unlock: "Unlock ZMK Studio for live editing",
+};
+
+/** Grouped actions for organized display in the picker */
+export interface ActionGroup {
+  label: string;
+  actions: Action[];
+}
+
+export const ACTION_GROUPS: ActionGroup[] = [
+  {
+    label: "Keys",
+    actions: ["kp", "mt", "lt", "sk", "kt", "gresc", "caps_word", "key_repeat", "td"],
+  },
+  {
+    label: "Custom Hold-Taps",
+    actions: ["hml", "hmr", "lt_th"],
+  },
+  {
+    label: "Layers",
+    actions: ["mo", "tog", "sl", "to", "trans", "none"],
+  },
+  {
+    label: "Mouse",
+    actions: ["mmv", "msc", "mkp"],
+  },
+  {
+    label: "Wireless",
+    actions: ["bt", "out"],
+  },
+  {
+    label: "Mod-Morphs & Macros",
+    actions: ["comma_morph", "dot_morph", "fat_arrow"],
+  },
+  {
+    label: "System",
+    actions: ["bootloader", "sys_reset", "soft_off", "ext_power", "studio_unlock"],
+  },
+];
 
 export const LAYERS = ["BASE", "NAV", "NUM", "FUN", "UTIL", "GAME"] as const;
 
 /** Actions that take no additional parameters */
 export const NO_PARAM_ACTIONS: ReadonlySet<string> = new Set([
   "trans", "none", "comma_morph", "dot_morph", "caps_word", "fat_arrow",
-  "key_repeat", "gresc", "soft_off", "bootloader", "sys_reset", "studio_unlock",
+  "td", "key_repeat", "gresc", "soft_off", "bootloader", "sys_reset", "studio_unlock",
 ]);
 
 /** Actions that take a hold modifier + tap keycode */

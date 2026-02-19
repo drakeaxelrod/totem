@@ -1,4 +1,5 @@
 pub mod framing;
+pub mod hid_usage;
 pub mod transport;
 
 use std::sync::atomic::{AtomicU32, Ordering};

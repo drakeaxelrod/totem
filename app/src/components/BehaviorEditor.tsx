@@ -7,6 +7,7 @@ import type {
   TapDanceBehavior,
   Behavior,
 } from "../lib/types.ts";
+import { NumberField } from "./NumberField.tsx";
 
 interface BehaviorEditorProps {
   behaviors: Behavior[];
@@ -37,6 +38,8 @@ function behaviorTypeLabel(type: Behavior["type"]): string {
       return "Mod-Morph";
     case "Macro":
       return "Macro";
+    case "TapDance":
+      return "Tap Dance";
   }
 }
 
@@ -48,43 +51,9 @@ function behaviorTypeColor(type: Behavior["type"]): string {
       return "text-[#fab387]";
     case "Macro":
       return "text-[#f38ba8]";
+    case "TapDance":
+      return "text-[#a6e3a1]";
   }
-}
-
-// ── Number Input ─────────────────────────────────────────────────────
-
-function NumberField({
-  label,
-  value,
-  onChange,
-  suffix,
-  min,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-  suffix?: string;
-  min?: number;
-}) {
-  return (
-    <div class="flex flex-col gap-1">
-      <label class="text-sm text-subtext font-medium">{label}</label>
-      <div class="flex items-center gap-1.5">
-        <input
-          type="number"
-          value={value}
-          min={min ?? 0}
-          onInput={(e) => {
-            const v = parseInt((e.target as HTMLInputElement).value, 10);
-            if (!isNaN(v)) onChange(v);
-          }}
-          class="w-24 px-2 py-1 bg-surface rounded text-sm text-text font-mono
-                 border border-overlay/50 outline-none focus:border-primary"
-        />
-        {suffix && <span class="text-sm text-subtext">{suffix}</span>}
-      </div>
-    </div>
-  );
 }
 
 // ── Optional Number Input ────────────────────────────────────────────
@@ -355,6 +324,55 @@ function MacroEditor({
   );
 }
 
+// ── TapDance Editor ──────────────────────────────────────────────
+
+function TapDanceEditor({
+  behavior,
+  onChange,
+}: {
+  behavior: TapDanceBehavior;
+  onChange: (b: TapDanceBehavior) => void;
+}) {
+  const update = <K extends keyof TapDanceBehavior>(
+    key: K,
+    value: TapDanceBehavior[K],
+  ) => {
+    onChange({ ...behavior, [key]: value });
+  };
+
+  return (
+    <div class="flex flex-col gap-3">
+      {/* Tapping term */}
+      <NumberField
+        label="Tapping term"
+        value={behavior.tapping_term_ms}
+        onChange={(v) => update("tapping_term_ms", v)}
+        suffix="ms"
+      />
+
+      {/* Binding sequence */}
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-subtext font-medium">
+          Bindings ({behavior.bindings.length} tap{behavior.bindings.length !== 1 ? "s" : ""})
+        </label>
+        <div class="flex flex-col gap-0.5">
+          {behavior.bindings.map((b, i) => (
+            <div key={i} class="flex items-center gap-2">
+              <span class="text-xs text-subtext w-4 text-right">{i + 1}.</span>
+              <code class="px-2 py-0.5 bg-surface rounded text-sm text-text font-mono">
+                {formatBinding(b)}
+              </code>
+            </div>
+          ))}
+          {behavior.bindings.length === 0 && (
+            <span class="text-sm text-subtext italic">No bindings</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Behavior Card ────────────────────────────────────────────────────
 
 function BehaviorCard({
@@ -404,6 +422,12 @@ function BehaviorCard({
           )}
           {behavior.type === "Macro" && (
             <MacroEditor
+              behavior={behavior}
+              onChange={(b) => onChange(b)}
+            />
+          )}
+          {behavior.type === "TapDance" && (
+            <TapDanceEditor
               behavior={behavior}
               onChange={(b) => onChange(b)}
             />

@@ -7,8 +7,8 @@ import { ComboOverlay } from "./components/ComboOverlay.tsx";
 import { ComboEditor } from "./components/ComboEditor.tsx";
 import { BehaviorEditor } from "./components/BehaviorEditor.tsx";
 import { MouseConfigEditor } from "./components/MouseConfigEditor.tsx";
-import { StatusBar, type ConnectionStatus } from "./components/StatusBar.tsx";
-import type { Binding, Behavior, Combo, MouseConfig, Keymap } from "./lib/types.ts";
+import { StatusBar } from "./components/StatusBar.tsx";
+import type { Binding, Behavior, Combo, MouseConfig, Keymap, ConnectionStatus } from "./lib/types.ts";
 
 export function App() {
   const [keymap, setKeymap] = useState<Keymap | null>(null);
@@ -17,6 +17,14 @@ export function App() {
   const [isDirty, setIsDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; kind: "success" | "error" } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = useCallback((message: string, kind: "success" | "error" = "success") => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ message, kind });
+    toastTimerRef.current = setTimeout(() => setToast(null), 4000);
+  }, []);
 
   // Device connection state
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
@@ -70,6 +78,9 @@ export function App() {
     setIsDirty(stack.length > 0 || true); // Still dirty since it differs from saved
   }, []);
 
+  // Track whether behaviors have been discovered for this connection
+  const [behaviorsReady, setBehaviorsReady] = useState(false);
+
   // Build state
   const build = useBuild();
 
@@ -78,6 +89,25 @@ export function App() {
       .then(setKeymap)
       .catch((e: unknown) => setError(String(e)));
   }, []);
+
+  // Discover behaviors when device becomes connected + unlocked
+  useEffect(() => {
+    if (
+      connectionStatus.state === "connected" &&
+      !connectionStatus.locked
+    ) {
+      invoke("discover_behaviors")
+        .then((behaviors) => {
+          console.log("Device behaviors discovered:", behaviors);
+          setBehaviorsReady(true);
+        })
+        .catch((e) => console.error("Failed to discover behaviors:", e));
+    } else {
+      setBehaviorsReady(false);
+    }
+  }, [
+    connectionStatus.state === "connected" && !connectionStatus.locked,
+  ]);
 
   // Ctrl+Z undo shortcut
   useEffect(() => {
@@ -220,15 +250,53 @@ export function App() {
         };
       });
       setIsDirty(true);
+
+      // Push to device if connected + unlocked
+      if (
+        connectionStatus.state === "connected" &&
+        !connectionStatus.locked &&
+        behaviorsReady
+      ) {
+        invoke("set_live_binding", {
+          layerId: activeLayer,
+          keyPosition: selectedKey,
+          action: newBinding.action,
+          params: newBinding.params,
+        }).catch((e) => {
+          console.error("Live edit failed:", e);
+          showToast(`Live edit failed: ${e}`, "error");
+        });
+      }
+
       setSelectedKey(null);
     },
-    [keymap, selectedKey, activeLayer, editingComboBinding],
+    [keymap, selectedKey, activeLayer, editingComboBinding, connectionStatus, behaviorsReady, showToast],
   );
 
   const handlePickerClose = useCallback(() => {
     setSelectedKey(null);
     setEditingComboBinding(null);
   }, []);
+
+  // ── Device save/discard ───────────────────────────────────────────────
+
+  const handleSaveToDevice = useCallback(async () => {
+    try {
+      await invoke("save_changes_live");
+      showToast("Saved to device");
+    } catch (e) {
+      showToast(`Save failed: ${e}`, "error");
+    }
+  }, [showToast]);
+
+  const handleDiscardDevice = useCallback(async () => {
+    try {
+      await invoke("discard_changes_live");
+      showToast("Device changes discarded");
+    } catch (e) {
+      showToast(`Discard failed: ${e}`, "error");
+    }
+  }, [showToast]);
 
   const handleSave = useCallback(async () => {
     if (!keymap) return;
@@ -656,6 +724,25 @@ export function App() {
           >
             {build.building ? "Building..." : "Build"}
           </button>
+          {connectionStatus.state === "connected" &&
+            !connectionStatus.locked &&
+            behaviorsReady && (
+              <>
+                <div class="w-px h-4 bg-overlay/30" />
+                <button
+                  class="px-3 py-1 rounded text-xs font-medium transition-colors text-[#a6e3a1] hover:bg-[#a6e3a1]/20"
+                  onClick={handleSaveToDevice}
+                >
+                  Save to Device
+                </button>
+                <button
+                  class="px-3 py-1 rounded text-xs font-medium transition-colors text-[#f9e2af] hover:bg-[#f9e2af]/20"
+                  onClick={handleDiscardDevice}
+                >
+                  Discard Device
+                </button>
+              </>
+            )}
         </div>
       </div>
 
@@ -953,6 +1040,20 @@ export function App() {
               Set None
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── Toast notification ── */}
+      {toast && (
+        <div
+          class={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 rounded-lg text-xs font-medium shadow-lg transition-opacity ${
+            toast.kind === "error"
+              ? "bg-[#f38ba8]/90 text-[#11111b]"
+              : "bg-[#a6e3a1]/90 text-[#11111b]"
+          }`}
+          onClick={() => setToast(null)}
+        >
+          {toast.message}
         </div>
       )}
     </div>

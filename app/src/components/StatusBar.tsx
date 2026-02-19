@@ -1,30 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
 import type { OutputLine } from "./BuildConsole.tsx";
+import type { DeviceInfo, ConnectedDeviceInfo, ConnectionStatus } from "../lib/types.ts";
 
 // ── Types ──
-
-interface DeviceInfo {
-  id: string;
-  name: string;
-  transport: "Usb" | "Ble";
-}
-
-interface ConnectedDeviceInfo {
-  name: string;
-  serial_number: string;
-  transport: "Usb" | "Ble";
-}
 
 interface BatteryInfo {
   levels: number[];
 }
-
-export type ConnectionStatus =
-  | { state: "disconnected" }
-  | { state: "scanning" }
-  | { state: "connecting"; device: DeviceInfo }
-  | { state: "connected"; info: ConnectedDeviceInfo };
 
 // ── Status Bar (unified with build output) ──
 
@@ -92,7 +75,7 @@ export function StatusBar({
           deviceId: device.id,
           transport: device.transport,
         });
-        onStatusChange({ state: "connected", info });
+        onStatusChange({ state: "connected", info, locked: true });
       } catch (e) {
         console.error("Auto-connect failed:", e);
         onStatusChange({ state: "disconnected" });
@@ -132,6 +115,16 @@ export function StatusBar({
     };
   }, [status.state]);
 
+  // Propagate lock state changes to parent
+  useEffect(() => {
+    if (status.state === "connected" && lockState !== null) {
+      const locked = lockState !== "unlocked";
+      if (status.locked !== locked) {
+        onStatusChange({ ...status, locked });
+      }
+    }
+  }, [lockState, status]);
+
   // Auto-scroll build output
   useEffect(() => {
     const el = outputRef.current;
@@ -140,16 +133,35 @@ export function StatusBar({
 
   const handleToggleLock = useCallback(async () => {
     if (!lockState) return;
+    const wantLock = lockState === "unlocked";
     setToggling(true);
     try {
-      await invoke("set_lock_state", { lock: lockState === "ZmkUnlocked" });
-      setTimeout(async () => {
+      await invoke("set_lock_state", { lock: wantLock });
+      if (wantLock) {
+        // Locking is immediate — single poll
         try {
           const s = await invoke<string>("get_lock_state");
           setLockState(s);
         } catch { /* ignore */ }
         setToggling(false);
-      }, 500);
+      } else {
+        // Unlocking requires physical confirmation — poll for up to 15s
+        let attempts = 0;
+        const poll = setInterval(async () => {
+          attempts++;
+          try {
+            const s = await invoke<string>("get_lock_state");
+            if (s === "unlocked" || attempts >= 30) {
+              clearInterval(poll);
+              setLockState(s);
+              setToggling(false);
+            }
+          } catch {
+            clearInterval(poll);
+            setToggling(false);
+          }
+        }, 500);
+      }
     } catch {
       setToggling(false);
     }
@@ -162,7 +174,17 @@ export function StatusBar({
     onStatusChange({ state: "disconnected" });
   }, [onStatusChange]);
 
-  const isLocked = lockState !== null && lockState !== "ZmkUnlocked";
+  const handleReconnect = useCallback(async () => {
+    try {
+      await invoke("disconnect_device");
+    } catch { /* ignore */ }
+    setBattery(null);
+    setLockState(null);
+    setDevices([]);
+    onStatusChange({ state: "disconnected" });
+  }, [onStatusChange]);
+
+  const isLocked = lockState !== null && lockState !== "unlocked";
 
   const dotClass = {
     disconnected: "bg-overlay",
@@ -244,7 +266,7 @@ export function StatusBar({
             disabled={toggling}
           >
             Studio: <span class={isLocked ? "text-[#f9e2af]" : "text-[#a6e3a1]"}>
-              {isLocked ? "Locked" : "Unlocked"}
+              {toggling && isLocked ? "Confirm on keyboard..." : isLocked ? "Locked" : "Unlocked"}
             </span>
           </button>
         )}
@@ -272,14 +294,23 @@ export function StatusBar({
           </button>
         )}
 
-        {/* Disconnect */}
+        {/* Connection controls */}
         {status.state === "connected" && (
-          <button
-            class="text-subtext hover:text-[#f38ba8] transition-colors"
-            onClick={handleDisconnect}
-          >
-            Disconnect
-          </button>
+          <>
+            <button
+              class="text-subtext hover:text-[#f9e2af] transition-colors"
+              onClick={handleReconnect}
+              title="Disconnect and reconnect"
+            >
+              Reconnect
+            </button>
+            <button
+              class="text-subtext hover:text-[#f38ba8] transition-colors"
+              onClick={handleDisconnect}
+            >
+              Disconnect
+            </button>
+          </>
         )}
       </div>
     </div>

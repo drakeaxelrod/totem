@@ -37,7 +37,7 @@
   --color-text: #cdd6f4;
   --color-subtext: #a6adc8;
   --color-overlay: #585b70;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif, "Lilex", "LilexNerdFont";
   --font-mono: "Lilex", "LilexNerdFont", monospace;
 }
 
