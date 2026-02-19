@@ -131,7 +131,7 @@
         combo_excl {
             timeout-ms = <80>;
             key-positions = <0 10>;
-            bindings = <&kp EXCL>;
+            bindings = <&kp C_PLAY_PAUSE>;
             layers = <BASE>;
         };
 
@@ -168,7 +168,7 @@
         combo_qmark {
             timeout-ms = <80>;
             key-positions = <10 21>;
-            bindings = <&kp QMARK>;
+            bindings = <&kp K_MUTE>;
             layers = <BASE>;
         };
 
@@ -293,14 +293,14 @@
         combo_dqt {
             timeout-ms = <80>;
             key-positions = <19 9>;
-            bindings = <&kp DQT>;
+            bindings = <&kp C_VOL_UP>;
             layers = <BASE>;
         };
 
         combo_arrow {
             timeout-ms = <80>;
             key-positions = <30 19>;
-            bindings = <&fat_arrow>;
+            bindings = <&kp C_VOL_DN>;
             layers = <BASE>;
         };
 
@@ -375,7 +375,7 @@
 
         combo_studio {
             timeout-ms = <80>;
-            key-positions = <32 37>;
+            key-positions = <20 31>;
             bindings = <&studio_unlock>;
         };
     };
@@ -413,9 +413,9 @@
             display-name = "NAV";
             bindings = <
             &kp K_UNDO  &kp K_CUT  &kp K_COPY  &kp K_PASTE  &kp K_REDO    &kp HOME  &kp PG_DN   &kp PG_UP  &kp END  &kp DEL
-            &kp LGUI    &kp LALT   &kp LCTRL   &kp LSHFT    &trans         &trans     &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT
-&kp K_BACK  &trans       &trans      &trans       &trans        &trans         &kp INS   &caps_word  &kp K_APP  &trans    &trans      &kp K_FORWARD
-                                   &trans       &trans        &trans         &trans     &trans       &trans
+            &kp LGUI    &kp LALT   &kp LCTRL   &kp LSHFT    &trans        &trans    &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT
+&kp K_BACK  &trans      &trans     &trans      &trans       &trans        &kp INS   &caps_word  &kp K_APP  &trans   &trans     &kp K_FORWARD
+                                   &trans      &trans       &trans        &trans    &trans      &trans
             >;
         };
 
@@ -425,10 +425,10 @@
         num_layer {
             display-name = "NUM";
             bindings = <
-          &kp KP_PLUS      &kp N7  &kp N8  &kp N9   &kp N0       &trans  &trans      &trans      &trans     &trans
+          &kp KP_PLUS      &kp N7  &kp N8  &kp N9   &kp N0       &trans  &trans     &trans     &trans    &trans
           &kp KP_MULTIPLY  &kp N4  &kp N5  &kp N6   &kp EQUAL    &trans  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
-&kp LPAR  &kp MINUS        &kp N1  &kp N2  &kp N3   &kp FSLH     &trans  &trans      &trans      &trans     &trans     &kp RPAR
-                                   &trans   &kp DOT  &kp SEMI     &trans  &trans      &trans
+&kp LPAR  &kp MINUS        &kp N1  &kp N2  &kp N3   &kp FSLH     &trans  &trans     &trans     &trans    &trans    &kp RPAR
+                                   &trans  &kp DOT  &kp SEMI     &trans  &trans     &trans
             >;
         };
 
@@ -451,10 +451,10 @@
         util_layer {
             display-name = "UTIL";
             bindings = <
-       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &trans    &msc SCRL_UP  &msc SCRL_DOWN  &kp C_VOL_UP    &msc SCRL_LEFT  &msc SCRL_RIGHT
-       &kp LGUI      &kp LALT      &kp LCTRL     &kp LSHFT   &trans    &trans         &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP    &mmv MOVE_RIGHT
-&trans  &out OUT_TOG  &trans         &trans         &trans       &trans    &trans         &mkp MB4        &mkp MB5        &trans           &trans            &kp C_MUTE
-                                   &trans         &trans       &trans    &mkp LCLK     &mkp RCLK       &mkp MCLK
+        &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &trans    &msc SCRL_UP  &msc SCRL_DOWN  &kp C_VOL_UP    &msc SCRL_LEFT  &msc SCRL_RIGHT
+        &kp LGUI      &kp LALT      &kp LCTRL     &kp LSHFT   &trans    &trans        &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP    &mmv MOVE_RIGHT
+&trans  &out OUT_TOG  &trans        &trans        &trans      &trans    &trans        &mkp MB4        &mkp MB5        &trans          &trans           &kp C_MUTE
+                                    &trans        &trans      &trans    &mkp LCLK     &mkp RCLK       &mkp MCLK
             >;
         };
 
