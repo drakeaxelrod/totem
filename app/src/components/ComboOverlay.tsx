@@ -1,6 +1,6 @@
 import { LAYOUT } from "../lib/layout.ts";
 import { getKeyLabel } from "../lib/keyLabels.ts";
-import type { Binding, Combo } from "../lib/types.ts";
+import type { Combo } from "../lib/types.ts";
 
 interface ComboOverlayProps {
   combos: Combo[];
@@ -164,8 +164,8 @@ function ComboLines({
         dominant-baseline="central"
         fill={color}
         font-size="2.5"
-        font-family="system-ui, sans-serif"
-        font-weight="600"
+        font-family="LilexMono, Lilex Nerd Font Mono, monospace"
+        font-weight="500"
       >
         {displayText}
       </text>

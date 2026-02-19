@@ -285,6 +285,15 @@ fn serialize_combos(out: &mut String, combos: &[Combo], layer_names: &[&str]) {
             "            bindings = <{}>;\n",
             format_binding(&combo.binding)
         ));
+        if let Some(ms) = combo.require_prior_idle_ms {
+            out.push_str(&format!(
+                "            require-prior-idle-ms = <{}>;\n",
+                ms
+            ));
+        }
+        if combo.slow_release {
+            out.push_str("            slow-release;\n");
+        }
         if !combo.layers.is_empty() {
             let layer_str: Vec<String> = combo
                 .layers

@@ -475,12 +475,19 @@ fn parse_combos(
             None => Vec::new(),
         };
 
+        let require_prior_idle_ms: Option<u32> =
+            extract_property(&body, "require-prior-idle-ms")
+                .and_then(|v| v.parse().ok());
+        let slow_release = has_boolean_property(&body, "slow-release");
+
         combos.push(Combo {
             name: short_name,
             positions,
             binding,
             timeout_ms,
             layers,
+            require_prior_idle_ms,
+            slow_release,
         });
     }
 

@@ -1,13 +1,12 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState, useCallback, useRef } from "preact/hooks";
-import { createPortal } from "preact/compat";
 import { KeyboardSvg } from "./components/KeyboardSvg.tsx";
-import { useBuild, BuildOutput } from "./components/BuildConsole.tsx";
+import { useBuild } from "./components/BuildConsole.tsx";
 import { BindingPicker } from "./components/BindingPicker.tsx";
 import { ComboOverlay } from "./components/ComboOverlay.tsx";
 import { ComboEditor } from "./components/ComboEditor.tsx";
 import { BehaviorEditor } from "./components/BehaviorEditor.tsx";
-import { Dialog } from "./components/Dialog.tsx";
+import { StatusBar, type ConnectionStatus } from "./components/StatusBar.tsx";
 import type { Binding, Behavior, Combo, Keymap } from "./lib/types.ts";
 
 export function App() {
@@ -18,16 +17,30 @@ export function App() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Device connection state
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
+    state: "disconnected",
+  });
+
+  // Sidebar tab
+  const [sidebarTab, setSidebarTab] = useState<"combos" | "behaviors">("combos");
+  const [showComboOverlay, setShowComboOverlay] = useState(false);
+
   // Combo editing state
-  const [comboMode, setComboMode] = useState(false);
   const [selectedCombo, setSelectedCombo] = useState<number | null>(null);
   const [isPickingPositions, setIsPickingPositions] = useState(false);
   const [pickingPositions, setPickingPositions] = useState<Set<number>>(new Set());
-  // When editing an existing combo's binding via BindingPicker
   const [editingComboBinding, setEditingComboBinding] = useState<number | null>(null);
 
-  // Behavior editing state
-  const [behaviorMode, setBehaviorMode] = useState(false);
+  // Clipboard for copy/paste bindings
+  const clipboardRef = useRef<Binding | null>(null);
+
+  // Context menus
+  const [keyContextMenu, setKeyContextMenu] = useState<{
+    pos: number;
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Undo history
   const historyRef = useRef<Keymap[]>([]);
@@ -81,8 +94,8 @@ export function App() {
 
   const handleKeyClick = useCallback(
     (pos: number) => {
-      // If we're in combo position-picking mode, toggle the position
-      if (comboMode && isPickingPositions) {
+      // If picking combo positions, toggle the position
+      if (isPickingPositions) {
         setPickingPositions((prev) => {
           const next = new Set(prev);
           if (next.has(pos)) {
@@ -95,12 +108,76 @@ export function App() {
         return;
       }
 
-      // Normal key editing (only when not in combo mode)
-      if (!comboMode) {
-        setSelectedKey(pos);
-      }
+      // Normal key editing
+      setSelectedKey(pos);
     },
-    [comboMode, isPickingPositions],
+    [isPickingPositions],
+  );
+
+  const handleKeyContextMenu = useCallback(
+    (pos: number, x: number, y: number) => {
+      if (isPickingPositions) return;
+      setKeyContextMenu({ pos, x, y });
+    },
+    [isPickingPositions],
+  );
+
+  const handleCopyBinding = useCallback(
+    (pos: number) => {
+      if (!keymap) return;
+      const binding = keymap.layers[activeLayer].bindings[pos];
+      if (binding) clipboardRef.current = structuredClone(binding);
+    },
+    [keymap, activeLayer],
+  );
+
+  const handlePasteBinding = useCallback(
+    (pos: number) => {
+      if (!keymap || !clipboardRef.current) return;
+      const pasted = structuredClone(clipboardRef.current);
+      updateKeymap((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          layers: prev.layers.map((layer, li) =>
+            li === activeLayer
+              ? {
+                  ...layer,
+                  bindings: layer.bindings.map((b, bi) =>
+                    bi === pos ? pasted : b,
+                  ),
+                }
+              : layer,
+          ),
+        };
+      });
+      setIsDirty(true);
+    },
+    [keymap, activeLayer],
+  );
+
+  const handleSetKeyBinding = useCallback(
+    (pos: number, binding: Binding) => {
+      if (!keymap) return;
+      updateKeymap((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          layers: prev.layers.map((layer, li) =>
+            li === activeLayer
+              ? {
+                  ...layer,
+                  bindings: layer.bindings.map((b, bi) =>
+                    bi === pos ? binding : b,
+                  ),
+                }
+              : layer,
+          ),
+        };
+      });
+      setIsDirty(true);
+    },
+    [keymap, activeLayer],
   );
 
   const handlePickerSave = useCallback(
@@ -167,22 +244,6 @@ export function App() {
 
   // ── Combo editing ────────────────────────────────────────────────────
 
-  const handleToggleComboMode = useCallback(() => {
-    setComboMode((prev) => {
-      if (prev) {
-        // Exiting combo mode: clean up
-        setSelectedCombo(null);
-        setIsPickingPositions(false);
-        setPickingPositions(new Set());
-        setEditingComboBinding(null);
-      } else {
-        // Entering combo mode: exit behavior mode
-        setBehaviorMode(false);
-      }
-      return !prev;
-    });
-  }, []);
-
   const handleSelectCombo = useCallback(
     (index: number | null) => {
       setSelectedCombo(index);
@@ -233,6 +294,25 @@ export function App() {
     [keymap],
   );
 
+  const handleDuplicateCombo = useCallback(
+    (index: number) => {
+      if (!keymap) return;
+      const src = keymap.combos[index];
+      if (!src) return;
+      const dup: Combo = {
+        ...structuredClone(src),
+        name: `${src.name}_copy`,
+      };
+      updateKeymap((prev) => {
+        if (!prev) return prev;
+        return { ...prev, combos: [...prev.combos, dup] };
+      });
+      setSelectedCombo(keymap.combos.length);
+      setIsDirty(true);
+    },
+    [keymap],
+  );
+
   const handleAddCombo = useCallback(() => {
     if (!keymap) return;
     const newCombo: Combo = {
@@ -241,6 +321,8 @@ export function App() {
       binding: { action: "kp", params: ["A"] },
       timeout_ms: 80,
       layers: [],
+      require_prior_idle_ms: null,
+      slow_release: false,
     };
     updateKeymap((prev) => {
       if (!prev) return prev;
@@ -349,6 +431,11 @@ export function App() {
 
   const [renamingLayer, setRenamingLayer] = useState<number | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [layerContextMenu, setLayerContextMenu] = useState<{
+    index: number;
+    x: number;
+    y: number;
+  } | null>(null);
 
   const handleAddLayer = useCallback(() => {
     if (!keymap) return;
@@ -379,7 +466,7 @@ export function App() {
             ...layer,
             index: newIdx,
             bindings: layer.bindings.map((b) => {
-              if (b.action === "lt_th" || b.action === "tog") {
+              if (["lt_th", "lt", "tog", "mo", "sl", "to"].includes(b.action)) {
                 const ref = parseInt(b.params[0], 10);
                 if (isNaN(ref)) return b;
                 if (ref === delIdx) {
@@ -446,21 +533,26 @@ export function App() {
     setRenamingLayer(null);
   }, [renamingLayer, renameValue, keymap]);
 
-  // ── Behavior editing ─────────────────────────────────────────────────
+  const handleDuplicateLayer = useCallback(
+    (srcIdx: number) => {
+      if (!keymap) return;
+      const src = keymap.layers[srcIdx];
+      const newLayer = {
+        name: `${src.name}_COPY`,
+        index: keymap.layers.length,
+        bindings: structuredClone(src.bindings),
+      };
+      updateKeymap((prev) => {
+        if (!prev) return prev;
+        return { ...prev, layers: [...prev.layers, newLayer] };
+      });
+      setActiveLayer(keymap.layers.length);
+      setIsDirty(true);
+    },
+    [keymap],
+  );
 
-  const handleToggleBehaviorMode = useCallback(() => {
-    setBehaviorMode((prev) => {
-      if (!prev) {
-        // Entering behavior mode: exit combo mode
-        setComboMode(false);
-        setSelectedCombo(null);
-        setIsPickingPositions(false);
-        setPickingPositions(new Set());
-        setEditingComboBinding(null);
-      }
-      return !prev;
-    });
-  }, []);
+  // ── Behavior editing ─────────────────────────────────────────────────
 
   const handleBehaviorsChange = useCallback(
     (behaviors: Behavior[]) => {
@@ -492,14 +584,14 @@ export function App() {
 
   const showPicker =
     (editingComboBinding !== null && pickerBinding !== null) ||
-    (selectedKey !== null && pickerBinding !== null && !comboMode);
+    (selectedKey !== null && pickerBinding !== null);
 
-  // Highlighted keys: selected key + combo positions when a combo is selected
+  // Highlighted keys: selected key + combo positions
   const highlightedKeys = new Set<number>();
-  if (!comboMode && selectedKey !== null) {
+  if (selectedKey !== null) {
     highlightedKeys.add(selectedKey);
   }
-  if (comboMode && selectedCombo !== null) {
+  if (selectedCombo !== null) {
     const combo = keymap.combos[selectedCombo];
     if (combo) {
       for (const p of combo.positions) {
@@ -509,102 +601,61 @@ export function App() {
   }
 
   return (
-    <div class="h-screen bg-surface text-text flex flex-col overflow-clip">
-      {/* Header: mode toggles + save */}
-      <div class="flex items-center gap-3 px-5 py-3 bg-surface-alt">
-        {/* Layers mode toggle */}
-        <button
-          class={`px-5 py-2.5 rounded-lg text-lg font-medium transition-colors ${
-            !comboMode && !behaviorMode
-              ? "bg-primary text-surface"
-              : "text-text/70 hover:text-text hover:bg-overlay/30"
-          }`}
-          onClick={() => {
-            setComboMode(false);
-            setBehaviorMode(false);
-            setSelectedCombo(null);
-            setIsPickingPositions(false);
-            setPickingPositions(new Set());
-            setEditingComboBinding(null);
-          }}
-        >
-          Layers
-        </button>
-
-        {/* Combo mode toggle */}
-        <button
-          class={`px-5 py-2.5 rounded-lg text-lg font-medium transition-colors ${
-            comboMode
-              ? "bg-[#fab387] text-surface"
-              : "text-text/70 hover:text-text hover:bg-overlay/30"
-          }`}
-          onClick={handleToggleComboMode}
-        >
-          Combos
-        </button>
-
-        {/* Behavior mode toggle */}
-        <button
-          class={`px-5 py-2.5 rounded-lg text-lg font-medium transition-colors ${
-            behaviorMode
-              ? "bg-[#89b4fa] text-surface"
-              : "text-text/70 hover:text-text hover:bg-overlay/30"
-          }`}
-          onClick={handleToggleBehaviorMode}
-        >
-          Behaviors
-        </button>
-
+    <div class="h-screen bg-surface text-text flex flex-col overflow-clip font-sans">
+      {/* ── Header ── */}
+      <div class="flex items-center gap-3 px-4 h-10 bg-surface-alt border-b border-overlay/30 shrink-0">
+        <span class="text-sm font-semibold tracking-wide text-text">TOTEM</span>
         <div class="flex-1" />
-        {/* Undo button */}
-        <button
-          class={`px-5 py-2.5 rounded-lg text-lg font-medium transition-colors ${
-            historyRef.current.length > 0
-              ? "text-text/70 hover:text-text hover:bg-overlay/30"
-              : "text-subtext/30 cursor-default"
-          }`}
-          onClick={historyRef.current.length > 0 ? handleUndo : undefined}
-          title="Undo (Ctrl+Z)"
-        >
-          Undo
-        </button>
-        {isDirty && (
-          <span class="text-base text-primary/80 mr-2">Unsaved changes</span>
-        )}
-        <button
-          class={`px-6 py-2.5 rounded-lg text-lg font-medium transition-colors ${
-            isDirty
-              ? "bg-primary text-surface hover:brightness-110"
-              : "bg-overlay/30 text-subtext cursor-default"
-          }`}
-          onClick={isDirty ? handleSave : undefined}
-          disabled={!isDirty || saving}
-        >
-          {saving ? "Saving..." : "Save"}
-        </button>
-        <button
-          class={`px-6 py-2.5 rounded-lg text-lg font-medium transition-colors ${
-            build.building
-              ? "bg-overlay/40 text-subtext cursor-not-allowed"
-              : "bg-[#a6e3a1] text-surface hover:brightness-110"
-          }`}
-          onClick={build.building ? undefined : build.startBuild}
-          disabled={build.building}
-        >
-          {build.building ? "Building..." : "Build"}
-        </button>
+        <div class="flex items-center gap-2">
+          {isDirty && (
+            <span class="w-1.5 h-1.5 rounded-full bg-primary" title="Unsaved changes" />
+          )}
+          <button
+            class={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              historyRef.current.length > 0
+                ? "text-subtext hover:text-text hover:bg-overlay/30"
+                : "text-overlay/40 cursor-default"
+            }`}
+            onClick={historyRef.current.length > 0 ? handleUndo : undefined}
+            title="Ctrl+Z"
+          >
+            Undo
+          </button>
+          <button
+            class={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              isDirty
+                ? "text-primary hover:bg-primary/20"
+                : "text-overlay/40 cursor-default"
+            }`}
+            onClick={isDirty ? handleSave : undefined}
+            disabled={!isDirty || saving}
+          >
+            Save
+          </button>
+          <button
+            class={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              build.building
+                ? "text-overlay/40 cursor-not-allowed"
+                : "text-[#a6e3a1] hover:bg-[#a6e3a1]/20"
+            }`}
+            onClick={build.building ? undefined : build.startBuild}
+            disabled={build.building}
+          >
+            {build.building ? "Building..." : "Build"}
+          </button>
+        </div>
       </div>
 
-      {/* Main content: keyboard + sidebar */}
-      <div class="flex-1 overflow-clip relative">
-        {/* Keyboard area — always full width */}
-        <div class="absolute inset-0 flex items-center justify-center p-6">
-          {/* Floating vertical layer bar (layers mode only) */}
-          {!comboMode && !behaviorMode && (
-            <div class="absolute left-4 top-1/4 -translate-y-1/2 flex flex-col gap-1 z-10">
-              {keymap.layers.map((l, i) => (
-                <div key={i} class="group relative flex items-center">
-                  {renamingLayer === i ? (
+      {/* ── Main content ── */}
+      <div class="flex-1 flex flex-row overflow-clip">
+        {/* Keyboard column */}
+        <div class="flex-1 min-w-0 flex flex-col overflow-clip">
+          {/* Layer tab strip */}
+          <div class="flex items-center gap-1 px-3 h-8 bg-surface border-b border-overlay/30 shrink-0">
+            {keymap.layers.map((l, i) => (
+              <div key={i} class="flex items-center">
+                {renamingLayer === i ? (
+                  <div class="flex items-center gap-1">
                     <input
                       type="text"
                       value={renameValue}
@@ -616,111 +667,153 @@ export function App() {
                         if (e.key === "Enter") handleFinishRename();
                         if (e.key === "Escape") setRenamingLayer(null);
                       }}
-                      class="px-3 py-2 rounded text-sm font-medium bg-surface border border-primary
-                             text-text outline-none w-24"
+                      class="px-2 py-0.5 rounded text-xs font-medium bg-surface border border-primary
+                             text-text outline-none w-20"
                       // biome-ignore lint/a11y/noAutofocus: rename input needs focus
                       autoFocus
                     />
-                  ) : (
-                    <button
-                      class={`px-3 py-2 rounded text-sm font-medium transition-colors whitespace-nowrap
-                              min-w-[4.5rem] text-center ${
-                        i === activeLayer
-                          ? "bg-primary text-surface"
-                          : "bg-surface-alt/80 text-text/70 hover:text-text hover:bg-overlay/30"
-                      }`}
-                      onClick={() => setActiveLayer(i)}
-                      onDblClick={() => handleStartRename(i)}
-                    >
-                      {l.name}
-                    </button>
-                  )}
-                  {/* Delete button (not for BASE layer) */}
-                  {i > 0 && renamingLayer !== i && (
-                    <button
-                      class="absolute -right-5 opacity-0 group-hover:opacity-100 transition-opacity
-                             text-[#f38ba8] hover:text-[#f38ba8]/80 text-xs font-bold"
-                      onClick={() => handleDeleteLayer(i)}
-                      title={`Delete ${l.name}`}
-                    >
-                      &times;
-                    </button>
-                  )}
-                </div>
-              ))}
-              {/* Add layer button */}
-              <button
-                class="px-3 py-2 rounded text-sm font-medium transition-colors
-                       bg-surface-alt/60 text-subtext hover:text-text hover:bg-overlay/30
-                       min-w-[4.5rem] text-center"
-                onClick={handleAddLayer}
-                title="Add new layer"
-              >
-                +
-              </button>
-            </div>
-          )}
+                    {i > 0 && (
+                      <button
+                        class="p-0.5 rounded text-xs text-[#f38ba8] hover:bg-[#f38ba8]/20
+                               transition-colors"
+                        onClick={() => {
+                          setRenamingLayer(null);
+                          handleDeleteLayer(i);
+                        }}
+                        title={`Delete ${l.name}`}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    class={`px-2.5 py-0.5 rounded text-xs font-medium transition-colors whitespace-nowrap ${
+                      i === activeLayer
+                        ? "bg-primary/20 text-primary"
+                        : "text-subtext hover:text-text hover:bg-overlay/20"
+                    }`}
+                    onClick={() => setActiveLayer(i)}
+                    onDblClick={() => handleStartRename(i)}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setLayerContextMenu({ index: i, x: e.clientX, y: e.clientY });
+                    }}
+                  >
+                    {l.name}
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              class="px-1.5 py-0.5 rounded text-xs transition-colors
+                     text-subtext hover:text-text hover:bg-overlay/20"
+              onClick={handleAddLayer}
+              title="Add layer"
+            >
+              +
+            </button>
 
-          {/* Keyboard + combo overlay wrapper */}
-          <div class="relative w-full h-full">
-            <KeyboardSvg
-              layer={keymap.layers[activeLayer]}
-              onKeyClick={handleKeyClick}
-              highlightedKeys={highlightedKeys.size > 0 ? highlightedKeys : undefined}
-            />
-            {/* Combo overlay */}
-            {comboMode && (
-              <ComboOverlay
+            <div class="flex-1" />
+
+            <button
+              class={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                showComboOverlay
+                  ? "bg-[#fab387]/20 text-[#fab387]"
+                  : "text-subtext hover:text-text hover:bg-overlay/20"
+              }`}
+              onClick={() => setShowComboOverlay((v) => !v)}
+              title="Toggle combo overlay"
+            >
+              Combos
+            </button>
+          </div>
+
+          {/* Keyboard SVG area */}
+          <div class="flex-1 flex items-center justify-center p-6 min-h-0">
+            <div class="relative w-full h-full">
+              <KeyboardSvg
+                layer={keymap.layers[activeLayer]}
+                onKeyClick={handleKeyClick}
+                onKeyContextMenu={handleKeyContextMenu}
+                highlightedKeys={highlightedKeys.size > 0 ? highlightedKeys : undefined}
+              />
+              {(showComboOverlay || selectedCombo !== null) && (
+                <ComboOverlay
+                  combos={keymap.combos}
+                  selectedCombo={selectedCombo}
+                  onComboClick={handleComboOverlayClick}
+                  pickingPositions={isPickingPositions ? pickingPositions : null}
+                  onPositionClick={handlePositionClick}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Sidebar ── */}
+        <div
+          class="shrink-0 flex flex-col border-l border-overlay/30 bg-surface-alt"
+          style="width:340px"
+        >
+          {/* Sidebar tab strip */}
+          <div class="flex items-center border-b border-overlay/30 shrink-0">
+            {(["combos", "behaviors"] as const).map((tab) => (
+              <button
+                key={tab}
+                class={`flex-1 px-3 py-1.5 text-xs font-medium transition-colors ${
+                  sidebarTab === tab
+                    ? "text-text border-b-2 border-primary"
+                    : "text-subtext hover:text-text"
+                }`}
+                onClick={() => setSidebarTab(tab)}
+              >
+                {tab === "combos"
+                  ? `Combos (${keymap.combos.length})`
+                  : `Behaviors (${keymap.behaviors.length})`}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          <div class="flex-1 overflow-y-auto">
+            {sidebarTab === "combos" && (
+              <ComboEditor
                 combos={keymap.combos}
                 selectedCombo={selectedCombo}
-                onComboClick={handleComboOverlayClick}
-                pickingPositions={isPickingPositions ? pickingPositions : null}
-                onPositionClick={handlePositionClick}
+                layerNames={keymap.layers.map((l) => l.name)}
+                onSelectCombo={handleSelectCombo}
+                onUpdateCombo={handleUpdateCombo}
+                onDeleteCombo={handleDeleteCombo}
+                onDuplicateCombo={handleDuplicateCombo}
+                onAddCombo={handleAddCombo}
+                isPickingPositions={isPickingPositions}
+                onStartPickingPositions={handleStartPickingPositions}
+                onOpenBindingPicker={handleOpenComboBindingPicker}
+              />
+            )}
+            {sidebarTab === "behaviors" && (
+              <BehaviorEditor
+                behaviors={keymap.behaviors}
+                onChange={handleBehaviorsChange}
               />
             )}
           </div>
         </div>
       </div>
 
-      {/* Build console */}
-      <BuildOutput
-        lines={build.lines}
-        exitCode={build.exitCode}
-        expanded={build.expanded}
-        setExpanded={build.setExpanded}
+      {/* ── Bottom bar (status + build output) ── */}
+      <StatusBar
+        status={connectionStatus}
+        onStatusChange={setConnectionStatus}
+        buildLines={build.lines}
+        buildExitCode={build.exitCode}
+        buildExpanded={build.expanded}
+        setBuildExpanded={build.setExpanded}
+        building={build.building}
       />
 
-      {/* Combo editor panel */}
-      {comboMode && createPortal(
-        <div style="position:fixed;top:52px;right:16px;bottom:16px;width:360px;z-index:40;background:#313244;border-radius:12px;border:1px solid rgba(88,91,112,0.4);overflow-y:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)">
-          <ComboEditor
-            combos={keymap.combos}
-            selectedCombo={selectedCombo}
-            layerNames={keymap.layers.map((l) => l.name)}
-            onSelectCombo={handleSelectCombo}
-            onUpdateCombo={handleUpdateCombo}
-            onDeleteCombo={handleDeleteCombo}
-            onAddCombo={handleAddCombo}
-            isPickingPositions={isPickingPositions}
-            onStartPickingPositions={handleStartPickingPositions}
-            onOpenBindingPicker={handleOpenComboBindingPicker}
-          />
-        </div>,
-        document.body
-      )}
-
-      {/* Behavior editor panel */}
-      {behaviorMode && createPortal(
-        <div style="position:fixed;top:52px;right:16px;bottom:16px;width:360px;z-index:40;background:#313244;border-radius:12px;border:1px solid rgba(88,91,112,0.4);overflow-y:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)">
-          <BehaviorEditor
-            behaviors={keymap.behaviors}
-            onChange={handleBehaviorsChange}
-          />
-        </div>,
-        document.body
-      )}
-
-      {/* Binding Picker Modal */}
+      {/* ── Binding Picker Modal ── */}
       {showPicker && pickerBinding && (
         <BindingPicker
           binding={pickerBinding}
@@ -729,6 +822,117 @@ export function App() {
           onSave={handlePickerSave}
           onClose={handlePickerClose}
         />
+      )}
+
+      {/* ── Layer context menu ── */}
+      {layerContextMenu && (
+        <div
+          class="fixed inset-0 z-50"
+          onClick={() => setLayerContextMenu(null)}
+          onContextMenu={(e) => { e.preventDefault(); setLayerContextMenu(null); }}
+        >
+          <div
+            class="absolute bg-surface border border-overlay/40 rounded-lg shadow-lg py-1 min-w-[140px]"
+            style={`left:${layerContextMenu.x}px;top:${layerContextMenu.y}px`}
+          >
+            <button
+              class="w-full text-left px-3 py-1.5 text-xs text-text hover:bg-overlay/20 transition-colors"
+              onClick={() => {
+                handleStartRename(layerContextMenu.index);
+                setLayerContextMenu(null);
+              }}
+            >
+              Rename
+            </button>
+            <button
+              class="w-full text-left px-3 py-1.5 text-xs text-text hover:bg-overlay/20 transition-colors"
+              onClick={() => {
+                handleDuplicateLayer(layerContextMenu.index);
+                setLayerContextMenu(null);
+              }}
+            >
+              Duplicate
+            </button>
+            {layerContextMenu.index > 0 && (
+              <button
+                class="w-full text-left px-3 py-1.5 text-xs text-[#f38ba8] hover:bg-[#f38ba8]/10 transition-colors"
+                onClick={() => {
+                  handleDeleteLayer(layerContextMenu.index);
+                  setLayerContextMenu(null);
+                }}
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Key context menu ── */}
+      {keyContextMenu && (
+        <div
+          class="fixed inset-0 z-50"
+          onClick={() => setKeyContextMenu(null)}
+          onContextMenu={(e) => { e.preventDefault(); setKeyContextMenu(null); }}
+        >
+          <div
+            class="absolute bg-surface border border-overlay/40 rounded-lg shadow-lg py-1 min-w-[140px]"
+            style={`left:${keyContextMenu.x}px;top:${keyContextMenu.y}px`}
+          >
+            <button
+              class="w-full text-left px-3 py-1.5 text-xs text-text hover:bg-overlay/20 transition-colors"
+              onClick={() => {
+                setSelectedKey(keyContextMenu.pos);
+                setKeyContextMenu(null);
+              }}
+            >
+              Edit
+            </button>
+            <button
+              class="w-full text-left px-3 py-1.5 text-xs text-text hover:bg-overlay/20 transition-colors"
+              onClick={() => {
+                handleCopyBinding(keyContextMenu.pos);
+                setKeyContextMenu(null);
+              }}
+            >
+              Copy
+            </button>
+            <button
+              class={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
+                clipboardRef.current
+                  ? "text-text hover:bg-overlay/20"
+                  : "text-overlay/40 cursor-default"
+              }`}
+              onClick={() => {
+                if (clipboardRef.current) {
+                  handlePasteBinding(keyContextMenu.pos);
+                }
+                setKeyContextMenu(null);
+              }}
+            >
+              Paste
+            </button>
+            <div class="h-px bg-overlay/30 my-0.5" />
+            <button
+              class="w-full text-left px-3 py-1.5 text-xs text-text hover:bg-overlay/20 transition-colors"
+              onClick={() => {
+                handleSetKeyBinding(keyContextMenu.pos, { action: "trans", params: [] });
+                setKeyContextMenu(null);
+              }}
+            >
+              Set Transparent
+            </button>
+            <button
+              class="w-full text-left px-3 py-1.5 text-xs text-text hover:bg-overlay/20 transition-colors"
+              onClick={() => {
+                handleSetKeyBinding(keyContextMenu.pos, { action: "none", params: [] });
+                setKeyContextMenu(null);
+              }}
+            >
+              Set None
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

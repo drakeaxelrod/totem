@@ -8,6 +8,7 @@ interface KeyboardSvgProps {
     bindings: Array<{ action: string; params: string[] }>;
   };
   onKeyClick?: (pos: number) => void;
+  onKeyContextMenu?: (pos: number, x: number, y: number) => void;
   highlightedKeys?: Set<number>;
 }
 
@@ -32,6 +33,12 @@ const ACTION_COLORS: Record<string, string> = {
   fat_arrow: "#f38ba8",
   sk: "#cba6f7",
   mo: "#a6e3a1",
+  lt: "#a6e3a1",
+  sl: "#cba6f7",
+  to: "#cba6f7",
+  kt: "#45475a",
+  soft_off: "#f38ba8",
+  gresc: "#45475a",
   key_repeat: "#f5c2e7",
   bootloader: "#f38ba8",
   sys_reset: "#f38ba8",
@@ -43,7 +50,7 @@ function getKeyColor(action: string): string {
 }
 
 // Dark backgrounds get light text, bright backgrounds get dark text
-const DARK_BG_ACTIONS = new Set(["kp", "trans", "none"]);
+const DARK_BG_ACTIONS = new Set(["kp", "kt", "gresc", "trans", "none"]);
 
 function getTextColor(action: string): { main: string; sub: string } {
   if (DARK_BG_ACTIONS.has(action)) {
@@ -59,10 +66,12 @@ function Key({
   keyPos,
   binding,
   onClick,
+  onContextMenu,
 }: {
   keyPos: KeyPosition;
   binding: { action: string; params: string[] };
   onClick?: () => void;
+  onContextMenu?: (e: MouseEvent) => void;
 }) {
   const { x, y, w, h, rot, rx, ry } = keyPos;
   const color = getKeyColor(binding.action);
@@ -71,6 +80,9 @@ function Key({
   const isTransparent = binding.action === "trans";
   const hasRotation = rot !== 0;
   const transform = hasRotation ? `rotate(${rot}, ${rx}, ${ry})` : undefined;
+
+  // Detect nerd font icon glyphs (MDI range: U+F0000+, stored as surrogate pairs so length=2)
+  const isIcon = (s: string) => s.length <= 2 && s.codePointAt(0)! >= 0xF0000;
 
   // Gap between keys: shrink the rect slightly
   const gap = 0.4;
@@ -86,6 +98,7 @@ function Key({
     <g
       transform={transform}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       style={{ cursor: onClick ? "pointer" : "default" }}
       class="key-group"
     >
@@ -110,7 +123,7 @@ function Key({
             dominant-baseline="central"
             fill={textColor.sub}
             font-size="2.4"
-            font-family="system-ui, sans-serif"
+            font-family="LilexMono, Lilex Nerd Font Mono, monospace"
           >
             {label.top}
           </text>
@@ -120,8 +133,8 @@ function Key({
             text-anchor="middle"
             dominant-baseline="central"
             fill={textColor.main}
-            font-size="3"
-            font-family="system-ui, sans-serif"
+            font-size={isIcon(label.main) ? "4" : "3"}
+            font-family="LilexMono, Lilex Nerd Font Mono, monospace"
             font-weight="500"
           >
             {label.main}
@@ -134,8 +147,8 @@ function Key({
           text-anchor="middle"
           dominant-baseline="central"
           fill={isTransparent ? "#585b70" : textColor.main}
-          font-size={label.main.length > 3 ? "2.4" : "3"}
-          font-family="system-ui, sans-serif"
+          font-size={isIcon(label.main) ? "4.5" : label.main.length > 3 ? "2.4" : "3"}
+          font-family="LilexMono, Lilex Nerd Font Mono, monospace"
           font-weight="500"
         >
           {label.main}
@@ -145,7 +158,7 @@ function Key({
   );
 }
 
-export function KeyboardSvg({ layer, onKeyClick, highlightedKeys }: KeyboardSvgProps) {
+export function KeyboardSvg({ layer, onKeyClick, onKeyContextMenu, highlightedKeys }: KeyboardSvgProps) {
   return (
     <svg
       viewBox={VIEWBOX}
@@ -171,6 +184,14 @@ export function KeyboardSvg({ layer, onKeyClick, highlightedKeys }: KeyboardSvgP
               keyPos={keyPos}
               binding={binding}
               onClick={onKeyClick ? () => onKeyClick(keyPos.index) : undefined}
+              onContextMenu={
+                onKeyContextMenu
+                  ? (e: MouseEvent) => {
+                      e.preventDefault();
+                      onKeyContextMenu(keyPos.index, e.clientX, e.clientY);
+                    }
+                  : undefined
+              }
             />
           </g>
         );

@@ -435,15 +435,6 @@ export function BehaviorEditor({ behaviors, onChange }: BehaviorEditorProps) {
 
   return (
     <div class="flex flex-col h-full">
-      {/* Panel header */}
-      <div class="px-3 py-2 border-b border-overlay/30">
-        <h2 class="text-base font-medium text-text">Behaviors</h2>
-        <p class="text-sm text-subtext mt-0.5">
-          {behaviors.length} behavior{behaviors.length !== 1 ? "s" : ""} defined
-        </p>
-      </div>
-
-      {/* Behavior list */}
       <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
         {behaviors.map((b, i) => (
           <BehaviorCard

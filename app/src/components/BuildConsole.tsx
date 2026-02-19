@@ -6,7 +6,7 @@ type BuildEvent =
   | { event: "stderr"; data: { line: string } }
   | { event: "exit"; data: { code: number } };
 
-type OutputLine = {
+export type OutputLine = {
   text: string;
   kind: "stdout" | "stderr" | "status";
 };

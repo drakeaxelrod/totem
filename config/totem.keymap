@@ -80,7 +80,7 @@
         lt_th: layer_tap_thumb {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            flavor = "hold-preferred";
+            flavor = "balanced";
             tapping-term-ms = <200>;
             quick-tap-ms = <200>;
             bindings = <&mo>, <&kp>;
@@ -130,6 +130,7 @@
 
         combo_excl {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <0 10>;
             bindings = <&kp C_PLAY_PAUSE>;
             layers = <BASE>;
@@ -137,6 +138,7 @@
 
         combo_at {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <1 11>;
             bindings = <&kp AT>;
             layers = <BASE>;
@@ -144,6 +146,7 @@
 
         combo_hash {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <2 12>;
             bindings = <&kp HASH>;
             layers = <BASE>;
@@ -151,6 +154,7 @@
 
         combo_dllr {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <3 13>;
             bindings = <&kp DLLR>;
             layers = <BASE>;
@@ -158,6 +162,7 @@
 
         combo_prcnt {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <4 14>;
             bindings = <&kp PRCNT>;
             layers = <BASE>;
@@ -167,6 +172,7 @@
 
         combo_qmark {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <10 21>;
             bindings = <&kp K_MUTE>;
             layers = <BASE>;
@@ -174,6 +180,7 @@
 
         combo_grave {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <11 22>;
             bindings = <&kp GRAVE>;
             layers = <BASE>;
@@ -181,6 +188,7 @@
 
         combo_bslh {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <12 23>;
             bindings = <&kp BSLH>;
             layers = <BASE>;
@@ -188,6 +196,7 @@
 
         combo_equal {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <13 24>;
             bindings = <&kp EQUAL>;
             layers = <BASE>;
@@ -195,6 +204,7 @@
 
         combo_tilde {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <14 25>;
             bindings = <&kp TILDE>;
             layers = <BASE>;
@@ -204,6 +214,7 @@
 
         combo_esc {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <11 12 13>;
             bindings = <&kp ESC>;
             layers = <BASE>;
@@ -211,6 +222,7 @@
 
         combo_cut {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <22 24>;
             bindings = <&kp LC(X)>;
             layers = <BASE>;
@@ -218,6 +230,7 @@
 
         combo_copy {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <22 23>;
             bindings = <&kp LC(C)>;
             layers = <BASE>;
@@ -225,6 +238,7 @@
 
         combo_paste {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <23 24>;
             bindings = <&kp LC(V)>;
             layers = <BASE>;
@@ -234,6 +248,7 @@
 
         combo_caret {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <5 15>;
             bindings = <&kp CARET>;
             layers = <BASE>;
@@ -241,6 +256,7 @@
 
         combo_plus {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <6 16>;
             bindings = <&kp PLUS>;
             layers = <BASE>;
@@ -248,6 +264,7 @@
 
         combo_star {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <7 17>;
             bindings = <&kp STAR>;
             layers = <BASE>;
@@ -255,6 +272,7 @@
 
         combo_amps {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <8 18>;
             bindings = <&kp AMPS>;
             layers = <BASE>;
@@ -264,6 +282,7 @@
 
         combo_under {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <15 26>;
             bindings = <&kp UNDER>;
             layers = <BASE>;
@@ -271,6 +290,7 @@
 
         combo_minus {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <16 27>;
             bindings = <&kp MINUS>;
             layers = <BASE>;
@@ -278,6 +298,7 @@
 
         combo_fslh {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <17 28>;
             bindings = <&kp FSLH>;
             layers = <BASE>;
@@ -285,6 +306,7 @@
 
         combo_pipe {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <18 29>;
             bindings = <&kp PIPE>;
             layers = <BASE>;
@@ -292,6 +314,7 @@
 
         combo_dqt {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <19 9>;
             bindings = <&kp C_VOL_UP>;
             layers = <BASE>;
@@ -299,6 +322,7 @@
 
         combo_arrow {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <30 19>;
             bindings = <&kp C_VOL_DN>;
             layers = <BASE>;
@@ -308,6 +332,7 @@
 
         combo_lbkt {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <6 7>;
             bindings = <&kp LBKT>;
             layers = <BASE>;
@@ -315,6 +340,7 @@
 
         combo_rbkt {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <7 8>;
             bindings = <&kp RBKT>;
             layers = <BASE>;
@@ -322,6 +348,7 @@
 
         combo_lpar {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <16 17>;
             bindings = <&kp LPAR>;
             layers = <BASE>;
@@ -329,6 +356,7 @@
 
         combo_rpar {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <17 18>;
             bindings = <&kp RPAR>;
             layers = <BASE>;
@@ -336,6 +364,7 @@
 
         combo_lbrc {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <27 28>;
             bindings = <&kp LBRC>;
             layers = <BASE>;
@@ -343,6 +372,7 @@
 
         combo_rbrc {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <28 29>;
             bindings = <&kp RBRC>;
             layers = <BASE>;
@@ -350,6 +380,7 @@
 
         combo_lt {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <15 16>;
             bindings = <&kp LT>;
             layers = <BASE>;
@@ -357,6 +388,7 @@
 
         combo_gt {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <18 19>;
             bindings = <&kp GT>;
             layers = <BASE>;
@@ -366,6 +398,7 @@
 
         combo_caps {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <13 16>;
             bindings = <&caps_word>;
             layers = <BASE>;
@@ -375,6 +408,7 @@
 
         combo_studio {
             timeout-ms = <80>;
+            require-prior-idle-ms = <150>;
             key-positions = <20 31>;
             bindings = <&studio_unlock>;
         };

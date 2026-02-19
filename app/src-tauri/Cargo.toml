@@ -12,6 +12,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+prost-build = "0.13"
 
 [dependencies]
 tauri = { version = "2", features = [] }
@@ -20,3 +21,8 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 regex = "1"
+prost = "0.13"
+serialport = "4"
+btleplug = "0.11"
+uuid = "1"
+tokio-stream = "0.1"

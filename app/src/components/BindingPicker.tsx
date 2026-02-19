@@ -189,6 +189,33 @@ function BtSelector({
       >
         BT CLR
       </button>
+      <button
+        class={`px-3 py-1.5 rounded text-sm transition-colors
+          ${params[0] === "BT_CLR_ALL"
+            ? "bg-primary text-surface"
+            : "bg-surface text-text hover:bg-overlay/50"}`}
+        onClick={() => onChange(["BT_CLR_ALL"])}
+      >
+        CLR ALL
+      </button>
+      <button
+        class={`px-3 py-1.5 rounded text-sm transition-colors
+          ${params[0] === "BT_NXT"
+            ? "bg-primary text-surface"
+            : "bg-surface text-text hover:bg-overlay/50"}`}
+        onClick={() => onChange(["BT_NXT"])}
+      >
+        BT NXT
+      </button>
+      <button
+        class={`px-3 py-1.5 rounded text-sm transition-colors
+          ${params[0] === "BT_PRV"
+            ? "bg-primary text-surface"
+            : "bg-surface text-text hover:bg-overlay/50"}`}
+        onClick={() => onChange(["BT_PRV"])}
+      >
+        BT PRV
+      </button>
     </div>
   );
 }
@@ -215,10 +242,12 @@ export function BindingPicker({ binding, position, layerNames, onSave, onClose }
       setParams([params[params.length - 1] ?? "A"]);
     } else if (HOLD_TAP_ACTIONS.has(newAction)) {
       setParams([params[0] ?? "LSHFT", params[1] ?? params[params.length - 1] ?? "A"]);
-    } else if (newAction === "lt_th") {
+    } else if (newAction === "lt_th" || newAction === "lt") {
       setParams([params[0] ?? "0", params[1] ?? params[params.length - 1] ?? "A"]);
-    } else if (newAction === "tog" || newAction === "mo") {
+    } else if (newAction === "tog" || newAction === "mo" || newAction === "sl" || newAction === "to") {
       setParams([params[0] ?? "0"]);
+    } else if (newAction === "kt") {
+      setParams([params[params.length - 1] ?? "A"]);
     } else if (newAction === "bt") {
       setParams(["BT_SEL", "0"]);
     } else if (newAction === "out") {
@@ -362,7 +391,7 @@ function ActionParams({
   }
 
   // Simple keypress
-  if (action === "kp") {
+  if (action === "kp" || action === "kt") {
     return (
       <div class="flex flex-col gap-1.5">
         <label class="text-xs text-subtext font-medium">Keycode</label>
@@ -398,7 +427,7 @@ function ActionParams({
   }
 
   // Layer-tap: layer + keycode
-  if (action === "lt_th") {
+  if (action === "lt_th" || action === "lt") {
     return (
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-1.5">
@@ -421,7 +450,7 @@ function ActionParams({
   }
 
   // Layer toggle / momentary layer
-  if (action === "tog" || action === "mo") {
+  if (action === "tog" || action === "mo" || action === "sl" || action === "to") {
     return (
       <div class="flex flex-col gap-1.5">
         <label class="text-xs text-subtext font-medium">Layer</label>

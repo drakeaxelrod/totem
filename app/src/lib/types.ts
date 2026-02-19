@@ -49,6 +49,8 @@ export interface Combo {
   binding: Binding;
   timeout_ms: number;
   layers: number[];
+  require_prior_idle_ms: number | null;
+  slow_release: boolean;
 }
 
 // ── Mouse config ─────────────────────────────────────────────────────

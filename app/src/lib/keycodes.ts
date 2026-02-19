@@ -37,10 +37,11 @@ export const CATEGORY_LABELS: Record<KeycodeCategory, string> = {
 export const ALL_KEYCODES: string[] = Object.values(KEYCODES).flat();
 
 export const ACTIONS = [
-  "kp", "hml", "hmr", "lt_th", "mt", "trans", "none",
-  "bt", "out", "tog", "mmv", "msc", "mkp",
+  "kp", "hml", "hmr", "lt_th", "lt", "mt", "trans", "none",
+  "bt", "out", "tog", "mo", "sl", "to", "mmv", "msc", "mkp",
   "comma_morph", "dot_morph", "caps_word", "fat_arrow",
-  "sk", "mo", "key_repeat", "bootloader", "sys_reset", "ext_power",
+  "sk", "kt", "key_repeat", "gresc", "soft_off",
+  "bootloader", "sys_reset", "ext_power", "studio_unlock",
 ] as const;
 
 export type Action = (typeof ACTIONS)[number];
@@ -49,13 +50,17 @@ export const ACTION_LABELS: Record<Action, string> = {
   kp: "Key Press",
   hml: "Home Row Mod (L)",
   hmr: "Home Row Mod (R)",
-  lt_th: "Layer Tap",
+  lt_th: "Layer Tap (Thumb)",
+  lt: "Layer Tap",
   mt: "Mod Tap",
   trans: "Transparent",
   none: "None",
   bt: "Bluetooth",
   out: "Output",
   tog: "Layer Toggle",
+  mo: "Momentary Layer",
+  sl: "Sticky Layer",
+  to: "To Layer",
   mmv: "Mouse Move",
   msc: "Mouse Scroll",
   mkp: "Mouse Button",
@@ -64,11 +69,14 @@ export const ACTION_LABELS: Record<Action, string> = {
   caps_word: "Caps Word",
   fat_arrow: "Fat Arrow",
   sk: "Sticky Key",
-  mo: "Momentary Layer",
+  kt: "Key Toggle",
   key_repeat: "Key Repeat",
+  gresc: "Grave Escape",
+  soft_off: "Soft Off",
   bootloader: "Bootloader",
   sys_reset: "System Reset",
   ext_power: "Ext Power",
+  studio_unlock: "Studio Unlock",
 };
 
 export const LAYERS = ["BASE", "NAV", "NUM", "FUN", "UTIL", "GAME"] as const;
@@ -76,7 +84,7 @@ export const LAYERS = ["BASE", "NAV", "NUM", "FUN", "UTIL", "GAME"] as const;
 /** Actions that take no additional parameters */
 export const NO_PARAM_ACTIONS: ReadonlySet<string> = new Set([
   "trans", "none", "comma_morph", "dot_morph", "caps_word", "fat_arrow",
-  "key_repeat", "bootloader", "sys_reset",
+  "key_repeat", "gresc", "soft_off", "bootloader", "sys_reset", "studio_unlock",
 ]);
 
 /** Actions that take a hold modifier + tap keycode */

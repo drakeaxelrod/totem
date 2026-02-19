@@ -51,6 +51,10 @@ pub struct Combo {
     pub binding: Binding,
     pub timeout_ms: u32,
     pub layers: Vec<usize>,
+    #[serde(default)]
+    pub require_prior_idle_ms: Option<u32>,
+    #[serde(default)]
+    pub slow_release: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

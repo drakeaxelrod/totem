@@ -117,7 +117,7 @@
                 echo "Installing dependencies..."
                 pnpm install
               fi
-              WAYLAND_DISPLAY= pnpm tauri dev
+              WEBKIT_DISABLE_DMABUF_RENDERER=1 pnpm tauri dev
               ;;
 
             *)
