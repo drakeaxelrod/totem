@@ -299,6 +299,38 @@ def parse_keymap(keymap_path):
     return layers
 
 
+def parse_combos(keymap_path):
+    """Parse combo definitions from the keymap.
+
+    Returns a list of (name, positions, binding_label) tuples.
+    """
+    text = keymap_path.read_text()
+
+    # Match each combo block
+    combo_pattern = re.compile(
+        r"(\w+)\s*\{\s*"
+        r"timeout-ms\s*=\s*<\d+>;\s*"
+        r"key-positions\s*=\s*<([^>]+)>;\s*"
+        r"bindings\s*=\s*<([^>]+)>",
+        re.DOTALL,
+    )
+
+    combos = []
+    for match in combo_pattern.finditer(text):
+        name = match.group(1)
+        if name == "compatible":
+            continue
+        positions = [int(p) for p in match.group(2).split()]
+        binding_str = match.group(3).strip()
+        # Remove leading &
+        if binding_str.startswith("&"):
+            binding_str = binding_str[1:]
+        tap, _, _ = parse_binding(binding_str)
+        combos.append((name, positions, tap))
+
+    return combos
+
+
 # ── SVG generation ────────────────────────────────────────────────────
 
 def get_svg_header_footer():
@@ -373,10 +405,160 @@ def generate_layer_svg(header, footer, layer_idx, bindings):
     return header + label + "\n" + "\n".join(keys) + "\n" + footer
 
 
+# ── Combo SVG generation ─────────────────────────────────────────────
+
+COMBO_H = 20
+COMBO_CHAR_W = 7.2   # approximate width per character at combo font size
+COMBO_PAD = 14        # horizontal padding inside combo box
+COMBO_MIN_W = 28      # minimum box width
+
+
+def combo_box_width(label):
+    """Calculate combo box width based on label length."""
+    return max(COMBO_MIN_W, len(label) * COMBO_CHAR_W + COMBO_PAD)
+
+
+def combo_midpoint(positions):
+    """Calculate the midpoint between key positions (ignoring rotation)."""
+    xs = [KEY_POSITIONS[p][0] for p in positions]
+    ys = [KEY_POSITIONS[p][1] for p in positions]
+    return sum(xs) / len(xs), sum(ys) / len(ys)
+
+
+def resolve_overlaps(combo_data, iterations=20, pad=4):
+    """Nudge overlapping combo boxes apart.
+
+    combo_data: list of [cx, cy, w, h] (mutable)
+    """
+    for _ in range(iterations):
+        moved = False
+        for i in range(len(combo_data)):
+            for j in range(i + 1, len(combo_data)):
+                ax, ay, aw, ah = combo_data[i]
+                bx, by, bw, bh = combo_data[j]
+                # Check axis-aligned overlap
+                ox = (aw / 2 + bw / 2 + pad) - abs(ax - bx)
+                oy = (ah / 2 + bh / 2 + pad) - abs(ay - by)
+                if ox > 0 and oy > 0:
+                    # Push apart along the axis with less overlap
+                    if ox < oy:
+                        shift = ox / 2
+                        if ax < bx:
+                            combo_data[i][0] -= shift
+                            combo_data[j][0] += shift
+                        else:
+                            combo_data[i][0] += shift
+                            combo_data[j][0] -= shift
+                    else:
+                        shift = oy / 2
+                        if ay < by:
+                            combo_data[i][1] -= shift
+                            combo_data[j][1] += shift
+                        else:
+                            combo_data[i][1] += shift
+                            combo_data[j][1] -= shift
+                    moved = True
+        if not moved:
+            break
+
+
+def render_combo_lines(positions, cx, cy):
+    """Render curved SVG path lines from each key center to the combo box center.
+
+    Lines bow outward from the keyboard center so they stay clear of keys.
+    Very short lines remain straight.
+    """
+    lines = []
+    # Approximate keyboard centre – used to decide "outward" direction
+    kbd_cx, kbd_cy = 425, 140
+
+    for p in positions:
+        kx, ky, _ = KEY_POSITIONS[p]
+        dx, dy = cx - kx, cy - ky
+        length = (dx**2 + dy**2) ** 0.5
+
+        # Very short lines: keep straight
+        if length < 15:
+            lines.append(f'      <path d="M {kx},{ky} L {cx},{cy}" class="combo" />')
+            continue
+
+        # Perpendicular unit vector
+        nx, ny = -dy / length, dx / length
+
+        # Pick the perpendicular direction pointing away from keyboard center
+        mid_x, mid_y = (kx + cx) / 2, (ky + cy) / 2
+        outx, outy = mid_x - kbd_cx, mid_y - kbd_cy
+        if nx * outx + ny * outy < 0:
+            nx, ny = -nx, -ny
+
+        # Bow proportional to line length, capped
+        bow = min(length * 0.25, 14)
+        cpx = mid_x + nx * bow
+        cpy = mid_y + ny * bow
+
+        lines.append(
+            f'      <path d="M {kx},{ky} Q {cpx:.1f},{cpy:.1f} {cx},{cy}" class="combo" />'
+        )
+    return "\n".join(lines)
+
+
+def render_combo_box(cx, cy, label, w):
+    """Render a combo box (rect + label) at the given center position."""
+    hw, hh = w / 2, COMBO_H / 2
+    label_esc = escape(label)
+    return (
+        f'      <g transform="translate({cx}, {cy})">\n'
+        f'        <rect rx="4" ry="4" x="{-hw}" y="{-hh}" '
+        f'width="{w}" height="{COMBO_H}" class="combo" />\n'
+        f'        <text x="0" y="0" class="combo">{label_esc}</text>\n'
+        f'      </g>'
+    )
+
+
+def generate_combos_svg(header, footer, base_bindings, combos):
+    """Generate an SVG showing the base layer with combo overlays."""
+    label = '      <text x="5" y="-20" class="label" font-size="16">Combos</text>'
+
+    # Render base layer keys (dimmed reference)
+    keys = []
+    for pos_idx, binding_str in enumerate(base_bindings):
+        tap, hold, is_trans = parse_binding(binding_str)
+        keys.append(render_key(pos_idx, tap, hold, is_trans, False))
+
+    # Build combo geometry: [cx, cy, w, h] per combo
+    combo_geom = []
+    for name, positions, tap_label in combos:
+        cx, cy = combo_midpoint(positions)
+        w = combo_box_width(tap_label)
+        combo_geom.append([cx, cy, w, COMBO_H])
+
+    # Resolve overlapping boxes
+    resolve_overlaps(combo_geom)
+
+    # Render combo lines and boxes with resolved positions
+    combo_lines = []
+    combo_boxes = []
+    for idx, (name, positions, tap_label) in enumerate(combos):
+        cx, cy, w, _ = combo_geom[idx]
+        combo_lines.append(render_combo_lines(positions, cx, cy))
+        combo_boxes.append(render_combo_box(cx, cy, tap_label, w))
+
+    parts = [header, label]
+    parts.extend(keys)
+    parts.append("      <!-- combo connection lines -->")
+    parts.extend(combo_lines)
+    parts.append("      <!-- combo boxes -->")
+    parts.extend(combo_boxes)
+    parts.append(footer)
+
+    return "\n".join(parts)
+
+
 # ── Main ──────────────────────────────────────────────────────────────
 
 def main():
     layers = parse_keymap(KEYMAP)
+    combos = parse_combos(KEYMAP)
     header, footer = get_svg_header_footer()
 
     if len(layers) != 6:
@@ -391,7 +573,14 @@ def main():
         out_path.write_text(svg)
         print(f"  \u2192 {out_path.relative_to(ROOT)}")
 
-    print(f"\nGenerated {len(layers)} layer SVGs.")
+    # Generate combos overlay SVG
+    if layers and combos:
+        svg = generate_combos_svg(header, footer, layers[0], combos)
+        out_path = SVG_DIR / "combos.svg"
+        out_path.write_text(svg)
+        print(f"  \u2192 {out_path.relative_to(ROOT)}")
+
+    print(f"\nGenerated {len(layers)} layer SVGs + combos.")
 
 
 if __name__ == "__main__":

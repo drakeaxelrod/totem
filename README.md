@@ -37,34 +37,7 @@ ZMK firmware for the [TOTEM](https://github.com/GEIGEIGEIST/TOTEM) 38-key split 
 
 ## Combos (80ms timeout, Base layer)
 
-All combos are vertical (top+home or home+bottom) or horizontal (adjacent keys).
-
-```
-Left vertical (top + home):           Right vertical (top + home):
-  B+N  = Play/Pause                     J+P  = ^
-  L+R  = @                              Y+H  = +
-  D+T  = #                              O+A  = *
-  C+S  = $                              U+E  = &
-  V+G  = %
-
-Left vertical (home + bottom):        Right vertical (home + bottom):
-  N+X  = Mute                           P+K  = _
-  R+Q  = `                              H+F  = -
-  T+M  = \                              A+'  = /
-  S+W  = =                              E+;  = |
-  G+Z  = ~                              I+,  = Vol+
-                                        ./: + I = Vol-
-
-Left horizontal:                       Right horizontal:
-  R+T+S = Esc                            Y+O  = [    O+U  = ]
-  Q+W   = Cut (Ctrl+X)                   H+A  = (    A+E  = )
-  Q+M   = Copy (Ctrl+C)                  F+'  = {    '+;  = }
-  M+W   = Paste (Ctrl+V)                 P+H  = <    E+I  = >
-
-Other:
-  S+H       = Caps Word
-  LShf+RShf = ZMK Studio unlock
-```
+![Combos](./assets/svg/layers/combos.svg)
 
 ## Home Row Mods
 
