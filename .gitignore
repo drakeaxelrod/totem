@@ -10,3 +10,6 @@ zmk/
 zephyr/
 modules/
 optional/
+.vscode/
+.idea/
+*.log

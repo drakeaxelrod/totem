@@ -27,7 +27,16 @@
 
         totem-script = pkgs.writeShellScriptBin "totem" ''
           set -e
-          ROOT="$(git rev-parse --show-toplevel)"
+          # Walk up to find the real project root (can't use git rev-parse
+          # because West-fetched repos like zmk/ have their own .git)
+          ROOT="$PWD"
+          while [ ! -f "$ROOT/flake.nix" ] && [ "$ROOT" != "/" ]; do
+            ROOT="$(dirname "$ROOT")"
+          done
+          if [ ! -f "$ROOT/flake.nix" ]; then
+            echo "Error: cannot find project root (no flake.nix found)" >&2
+            exit 1
+          fi
           BUILD="$ROOT/build"
           cd "$ROOT"
 
@@ -46,7 +55,7 @@
           zmk_build() {
             local shield="$1" name="$2"
             echo "  Building $shield..."
-            west build -s zmk/app -d .build/"$name" -b xiao_ble -- \
+            west build -s zmk/app -d .build/"$name" -b xiao_ble//zmk -- \
               -DSHIELD="$shield" -DZMK_CONFIG="$ROOT/config"
           }
 

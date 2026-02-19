@@ -413,9 +413,9 @@
             display-name = "NAV";
             bindings = <
             &kp K_UNDO  &kp K_CUT  &kp K_COPY  &kp K_PASTE  &kp K_REDO    &kp HOME  &kp PG_DN   &kp PG_UP  &kp END  &kp DEL
-            &kp LGUI    &kp LALT   &kp LCTRL   &kp LSHFT    &none         &none     &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT
-&kp K_BACK  &none       &none      &none       &none        &none         &kp INS   &caps_word  &kp K_APP  &none    &none      &kp K_FORWARD
-                                   &none       &none        &none         &none     &none       &none
+            &kp LGUI    &kp LALT   &kp LCTRL   &kp LSHFT    &trans         &trans     &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT
+&kp K_BACK  &trans       &trans      &trans       &trans        &trans         &kp INS   &caps_word  &kp K_APP  &trans    &trans      &kp K_FORWARD
+                                   &trans       &trans        &trans         &trans     &trans       &trans
             >;
         };
 
@@ -425,10 +425,10 @@
         num_layer {
             display-name = "NUM";
             bindings = <
-          &kp KP_PLUS      &kp N7  &kp N8  &kp N9   &kp N0       &none  &none      &none      &none     &none
-          &kp KP_MULTIPLY  &kp N4  &kp N5  &kp N6   &kp EQUAL    &none  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
-&kp LPAR  &kp MINUS        &kp N1  &kp N2  &kp N3   &kp FSLH     &none  &none      &none      &none     &none     &kp RPAR
-                                   &none   &kp DOT  &kp SEMI     &none  &none      &none
+          &kp KP_PLUS      &kp N7  &kp N8  &kp N9   &kp N0       &trans  &trans      &trans      &trans     &trans
+          &kp KP_MULTIPLY  &kp N4  &kp N5  &kp N6   &kp EQUAL    &trans  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
+&kp LPAR  &kp MINUS        &kp N1  &kp N2  &kp N3   &kp FSLH     &trans  &trans      &trans      &trans     &trans     &kp RPAR
+                                   &trans   &kp DOT  &kp SEMI     &trans  &trans      &trans
             >;
         };
 
@@ -451,10 +451,10 @@
         util_layer {
             display-name = "UTIL";
             bindings = <
-       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &none    &msc SCRL_UP  &msc SCRL_DOWN  &kp C_VOL_UP    &msc SCRL_LEFT  &msc SCRL_RIGHT
-       &kp LGUI      &kp LALT      &kp LCTRL     &kp LSHFT   &none    &none         &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP    &mmv MOVE_RIGHT
-&none  &out OUT_TOG  &none         &none         &none       &none    &none         &mkp MB4        &mkp MB5        &none           &none            &kp C_MUTE
-                                   &none         &none       &none    &mkp LCLK     &mkp RCLK       &mkp MCLK
+       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &trans    &msc SCRL_UP  &msc SCRL_DOWN  &kp C_VOL_UP    &msc SCRL_LEFT  &msc SCRL_RIGHT
+       &kp LGUI      &kp LALT      &kp LCTRL     &kp LSHFT   &trans    &trans         &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP    &mmv MOVE_RIGHT
+&trans  &out OUT_TOG  &trans         &trans         &trans       &trans    &trans         &mkp MB4        &mkp MB5        &trans           &trans            &kp C_MUTE
+                                   &trans         &trans       &trans    &mkp LCLK     &mkp RCLK       &mkp MCLK
             >;
         };
 
