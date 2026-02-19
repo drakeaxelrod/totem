@@ -1,0 +1,28 @@
+if SHIELD_TOTEM_LEFT
+
+config ZMK_KEYBOARD_NAME
+    default "TOTEM"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif
+
+if SHIELD_TOTEM_LEFT || SHIELD_TOTEM_RIGHT
+
+config ZMK_SPLIT
+    default y
+
+endif
+
+# ── Settings reset with correct flash partition ──
+
+if SHIELD_TOTEM_SETTINGS_RESET
+
+config ZMK_SETTINGS_RESET_ON_START
+    default y
+
+config ZMK_BLE_CLEAR_BONDS_ON_START
+    default y
+
+endif

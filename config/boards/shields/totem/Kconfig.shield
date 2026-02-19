@@ -1,0 +1,8 @@
+config SHIELD_TOTEM_LEFT
+    def_bool $(shields_list_contains,totem_left)
+
+config SHIELD_TOTEM_RIGHT
+    def_bool $(shields_list_contains,totem_right)
+
+config SHIELD_TOTEM_SETTINGS_RESET
+    def_bool $(shields_list_contains,totem_settings_reset)
