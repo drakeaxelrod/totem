@@ -370,6 +370,21 @@ fn parse_behaviors(
                     bindings,
                 });
             }
+            Some("zmk,behavior-tap-dance") => {
+                let tapping_term_ms: u32 = extract_property(&body, "tapping-term-ms")
+                    .unwrap_or_default()
+                    .parse()
+                    .unwrap_or(200);
+                let bindings_str = extract_property(&body, "bindings").unwrap_or_default();
+                let bindings = parse_bindings_list(&bindings_str)?;
+
+                behaviors.push(Behavior::TapDance {
+                    name: short_name,
+                    label,
+                    tapping_term_ms,
+                    bindings,
+                });
+            }
             _ => {
                 // Skip unknown behavior types
             }

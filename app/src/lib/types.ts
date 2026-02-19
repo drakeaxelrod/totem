@@ -39,7 +39,15 @@ export interface MacroBehavior {
   bindings: Binding[];
 }
 
-export type Behavior = HoldTapBehavior | ModMorphBehavior | MacroBehavior;
+export interface TapDanceBehavior {
+  type: "TapDance";
+  name: string;
+  label: string;
+  tapping_term_ms: number;
+  bindings: Binding[];
+}
+
+export type Behavior = HoldTapBehavior | ModMorphBehavior | MacroBehavior | TapDanceBehavior;
 
 // ── Combo ────────────────────────────────────────────────────────────
 

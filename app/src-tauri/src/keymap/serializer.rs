@@ -214,6 +214,28 @@ fn serialize_behaviors(out: &mut String, behaviors: &[Behavior]) {
                 ));
                 out.push_str("        };\n");
             }
+            Behavior::TapDance {
+                name,
+                label,
+                tapping_term_ms,
+                bindings,
+            } => {
+                out.push_str("\n");
+                out.push_str(&format!("        {}: {} {{\n", name, label));
+                out.push_str("            compatible = \"zmk,behavior-tap-dance\";\n");
+                out.push_str("            #binding-cells = <0>;\n");
+                out.push_str(&format!(
+                    "            tapping-term-ms = <{}>;\n",
+                    tapping_term_ms
+                ));
+                let bindings_str: Vec<String> =
+                    bindings.iter().map(|b| format_binding(b)).collect();
+                out.push_str(&format!(
+                    "            bindings = <{}>;\n",
+                    bindings_str.join(" ")
+                ));
+                out.push_str("        };\n");
+            }
         }
     }
 

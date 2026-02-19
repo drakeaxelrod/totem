@@ -4,6 +4,7 @@ import type {
   HoldTapBehavior,
   ModMorphBehavior,
   MacroBehavior,
+  TapDanceBehavior,
   Behavior,
 } from "../lib/types.ts";
 

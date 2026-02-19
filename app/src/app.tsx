@@ -6,8 +6,9 @@ import { BindingPicker } from "./components/BindingPicker.tsx";
 import { ComboOverlay } from "./components/ComboOverlay.tsx";
 import { ComboEditor } from "./components/ComboEditor.tsx";
 import { BehaviorEditor } from "./components/BehaviorEditor.tsx";
+import { MouseConfigEditor } from "./components/MouseConfigEditor.tsx";
 import { StatusBar, type ConnectionStatus } from "./components/StatusBar.tsx";
-import type { Binding, Behavior, Combo, Keymap } from "./lib/types.ts";
+import type { Binding, Behavior, Combo, MouseConfig, Keymap } from "./lib/types.ts";
 
 export function App() {
   const [keymap, setKeymap] = useState<Keymap | null>(null);
@@ -23,7 +24,7 @@ export function App() {
   });
 
   // Sidebar tab
-  const [sidebarTab, setSidebarTab] = useState<"combos" | "behaviors">("combos");
+  const [sidebarTab, setSidebarTab] = useState<"combos" | "behaviors" | "mouse">("combos");
   const [showComboOverlay, setShowComboOverlay] = useState(false);
 
   // Combo editing state
@@ -566,6 +567,18 @@ export function App() {
     [keymap],
   );
 
+  const handleMouseConfigChange = useCallback(
+    (mouse_config: MouseConfig) => {
+      if (!keymap) return;
+      updateKeymap((prev) => {
+        if (!prev) return prev;
+        return { ...prev, mouse_config };
+      });
+      setIsDirty(true);
+    },
+    [keymap],
+  );
+
   // ── Render ───────────────────────────────────────────────────────────
 
   if (error) return <div class="min-h-screen bg-surface text-red-400 p-8">{error}</div>;
@@ -758,7 +771,7 @@ export function App() {
         >
           {/* Sidebar tab strip */}
           <div class="flex items-center border-b border-overlay/30 shrink-0">
-            {(["combos", "behaviors"] as const).map((tab) => (
+            {(["combos", "behaviors", "mouse"] as const).map((tab) => (
               <button
                 key={tab}
                 class={`flex-1 px-3 py-1.5 text-xs font-medium transition-colors ${
@@ -770,7 +783,9 @@ export function App() {
               >
                 {tab === "combos"
                   ? `Combos (${keymap.combos.length})`
-                  : `Behaviors (${keymap.behaviors.length})`}
+                  : tab === "behaviors"
+                    ? `Behaviors (${keymap.behaviors.length})`
+                    : "Mouse"}
               </button>
             ))}
           </div>
@@ -796,6 +811,12 @@ export function App() {
               <BehaviorEditor
                 behaviors={keymap.behaviors}
                 onChange={handleBehaviorsChange}
+              />
+            )}
+            {sidebarTab === "mouse" && (
+              <MouseConfigEditor
+                config={keymap.mouse_config}
+                onChange={handleMouseConfigChange}
               />
             )}
           </div>

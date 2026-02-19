@@ -216,6 +216,31 @@ function BtSelector({
       >
         BT PRV
       </button>
+      <button
+        class={`px-3 py-1.5 rounded text-sm transition-colors
+          ${params[0] === "BT_DISC"
+            ? "bg-primary text-surface"
+            : "bg-surface text-text hover:bg-overlay/50"}`}
+        onClick={() => onChange(["BT_DISC", params[0] === "BT_DISC" ? (params[1] ?? "0") : "0"])}
+      >
+        BT DISC
+      </button>
+      {params[0] === "BT_DISC" && (
+        <div class="flex gap-1 w-full">
+          {[0, 1, 2, 3, 4].map((n) => (
+            <button
+              key={n}
+              class={`px-2.5 py-1 rounded text-xs transition-colors
+                ${params[1] === String(n)
+                  ? "bg-primary text-surface"
+                  : "bg-surface text-text hover:bg-overlay/50"}`}
+              onClick={() => onChange(["BT_DISC", String(n)])}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

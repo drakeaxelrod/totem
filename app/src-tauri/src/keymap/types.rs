@@ -86,4 +86,10 @@ pub enum Behavior {
         tap_ms: u32,
         bindings: Vec<Binding>,
     },
+    TapDance {
+        name: String,
+        label: String,
+        tapping_term_ms: u32,
+        bindings: Vec<Binding>,
+    },
 }
