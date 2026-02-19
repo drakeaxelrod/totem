@@ -1,66 +1,127 @@
+# TOTEM
 
+ZMK firmware for the [TOTEM](https://github.com/GEIGEIGEIST/TOTEM) 38-key split keyboard by GEIGEIGEIST, running on two Seeed XIAO nRF52840 Sense controllers.
 
+## Layout
 
-## Reference
+**Gallium** alpha layout with home row mods (GACS order), 33 combos, 2 mod-morphs, mouse keys, and 6 layers.
 
--  https://www.reddit.com/r/KeyboardLayouts/comments/1iqo9ob/galite_galliumgraphite_hybrid_with_simplified/
-<!-- ![Miryoku](./assets/miryoku-reference.png) -->
-
-- **Keyboard:** Totem
-- **Keys**: 3x5 + 1, 3 thumb keys per hand (38 total)
-- **Layout:** Gallium
-- **Firmware:** ZMK
-- **Layers:** TBD
-
-## Layers
-
-### Base Layer
+### Base (Gallium)
 
 ![Base Layer](./assets/svg/layers/base.svg)
 
-```
-Left Hand     Right Hand
-B L D C V     J Y O U ,
-N E T S G     P H A E I
-X Q M W Z     K F ' ; .
-```
+- **Home row mods** (GACS): Gui/Alt/Ctrl/Shift on left, mirrored on right
+- **Hyper** (all 4 mods) on W and F
+- **Mod-morphs**: `,` -> `;` and `.` -> `:` when shifted
+- **Side buttons** (pos 20/31): dedicated LShift / RShift
 
-<!--
-### Symbol Layer
-
-```
-Left Hand     Right Hand
-` < > - \     ^ { } $ |
-! * / = &     # ( ) ; "
-~ + [ ] %     @ : , . '
-```
-
-![Symbol Layer](./assets/svg/layers/sym.svg)
--->
-
-### Number/Symbol Layer
-
-
-
-![Number Layer](./assets/svg/layers/num.svg)
-
-
-
-### Nav Layer
-
+### Nav (hold Space)
 
 ![Nav Layer](./assets/svg/layers/nav.svg)
 
-- arrow up/down/left/right keys, home/end, pg up/down
-- mouse up/down/left/right keys, mouse buttons left/right/center, scroll up/down/left/right, mouse jiggler.
-- Caps Lock, Copy, Paste, Cut, and Undo, Redo, ScrLock, NumLock, hyper, meh,
+### Num (hold Backspace)
 
+![Num Layer](./assets/svg/layers/num.svg)
 
-### Func Layer
+### Fun (hold Delete)
 
+![Fun Layer](./assets/svg/layers/fun.svg)
 
-![Func Layer](./assets/svg/layers/func.svg)
+### Util + Mouse (hold Escape)
 
-- arrow up/down/left/right keys, home/end, pg up/down
-- mouse up/down/left/right keys, mouse buttons left/right/center, scroll up/down/left/right, mouse jiggler.
-- Caps Lock, Copy, Paste, Cut, and Undo, Redo, ScrLock, NumLock, hyper, meh,
+![Util Layer](./assets/svg/layers/util.svg)
+
+### Game (toggle from Fun layer)
+
+![Game Layer](./assets/svg/layers/game.svg)
+
+## Combos (80ms timeout, Base layer)
+
+All combos are vertical (top+home or home+bottom) or horizontal (adjacent keys).
+
+```
+Left vertical (top + home):           Right vertical (top + home):
+  B+N  = Play/Pause                     J+P  = ^
+  L+R  = @                              Y+H  = +
+  D+T  = #                              O+A  = *
+  C+S  = $                              U+E  = &
+  V+G  = %
+
+Left vertical (home + bottom):        Right vertical (home + bottom):
+  N+X  = Mute                           P+K  = _
+  R+Q  = `                              H+F  = -
+  T+M  = \                              A+'  = /
+  S+W  = =                              E+;  = |
+  G+Z  = ~                              I+,  = Vol+
+                                        ./: + I = Vol-
+
+Left horizontal:                       Right horizontal:
+  R+T+S = Esc                            Y+O  = [    O+U  = ]
+  Q+W   = Cut (Ctrl+X)                   H+A  = (    A+E  = )
+  Q+M   = Copy (Ctrl+C)                  F+'  = {    '+;  = }
+  M+W   = Paste (Ctrl+V)                 P+H  = <    E+I  = >
+
+Other:
+  S+H       = Caps Word
+  LShf+RShf = ZMK Studio unlock
+```
+
+## Home Row Mods
+
+| Setting | Value |
+|---|---|
+| Flavor | balanced (positional hold-tap) |
+| Tapping term | 280ms |
+| Quick tap | 175ms |
+| Require prior idle | 150ms |
+| Hold trigger | opposite hand + thumbs only |
+
+Thumb layer-taps use **hold-preferred** flavor with 200ms tapping term for fast layer activation.
+
+## Hardware
+
+| Component | Detail |
+|---|---|
+| Keyboard | TOTEM by GEIGEIGEIST |
+| Controllers | 2x Seeed XIAO nRF52840 Sense |
+| Keys | 38 (3x5 + 1 side + 3 thumb per hand) |
+| Matrix | 4x10 (col2row) |
+| Connection | USB-C or Bluetooth (5 profiles) |
+
+## Building
+
+### Local (Nix)
+
+```bash
+nix develop          # enter dev shell
+totem                # build left + right + settings_reset
+totem bootloader     # download XIAO bootloader
+totem update         # west update
+```
+
+Outputs go to `build/`:
+- `totem-zmk-left.uf2` (central)
+- `totem-zmk-right.uf2` (peripheral)
+- `totem-zmk-settings-reset.uf2` (bond/settings reset)
+
+### GitHub Actions
+
+Push to `config/` triggers a build via ZMK's reusable workflow. Download UF2 artifacts from the Actions tab.
+
+### Regenerate layer SVGs
+
+```bash
+gen-svg    # regenerates assets/svg/layers/*.svg from keymap
+```
+
+## Flashing
+
+1. Double-tap reset on the XIAO to enter UF2 bootloader (mounts as `XIAO-SENSE`)
+2. Copy the appropriate `.uf2` file to the mounted drive
+3. Flash left half first, then right half
+
+To clear Bluetooth bonds, flash `totem-zmk-settings-reset.uf2` on **both** halves, then reflash the regular firmware.
+
+## ZMK Studio
+
+Runtime keymap editing is enabled. Unlock with the **LShift + RShift** combo (key positions 20 + 31).
