@@ -292,7 +292,7 @@
 
         combo_dqt {
             timeout-ms = <80>;
-            key-positions = <29 19>;
+            key-positions = <19 9>;
             bindings = <&kp DQT>;
             layers = <BASE>;
         };
