@@ -8,3 +8,12 @@
   --color-subtext: #a6adc8;
   --color-overlay: #585b70;
 }
+
+/* Dark form elements */
+select,
+select option,
+input[type="number"],
+input[type="text"] {
+  background-color: #1e1e2e !important;
+  color: #cdd6f4 !important;
+}
