@@ -9,7 +9,7 @@ fn main() {
                 "proto/zmk/behaviors.proto",
                 "proto/zmk/meta.proto",
             ],
-            &["proto"],
+            &["proto/zmk"],
         )
         .expect("Failed to compile protobuf definitions");
 

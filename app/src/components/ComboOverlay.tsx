@@ -1,4 +1,5 @@
-import { LAYOUT } from "../lib/layout.ts";
+import type { KeyPosition } from "../lib/layout.ts";
+import { computeViewBox } from "../lib/layout.ts";
 import { getKeyLabel } from "../lib/keyLabels.ts";
 import type { Combo } from "../lib/types.ts";
 
@@ -9,25 +10,23 @@ interface ComboOverlayProps {
   /** When non-null, we are in position-picking mode and these are the currently selected positions */
   pickingPositions: Set<number> | null;
   onPositionClick?: (pos: number) => void;
+  layout: KeyPosition[];
 }
 
-const PADDING = 2;
-const VIEWBOX = `${-PADDING} ${-PADDING} ${150.3 + PADDING * 2} ${53.3 + PADDING * 2}`;
-
 /** Get the visual center of a key position */
-function keyCenter(index: number): { cx: number; cy: number } {
-  const kp = LAYOUT[index];
+function keyCenter(index: number, layout: KeyPosition[]): { cx: number; cy: number } {
+  const kp = layout[index];
   if (!kp) return { cx: 0, cy: 0 };
   return { cx: kp.x + kp.w / 2, cy: kp.y + kp.h / 2 };
 }
 
 /** Compute the centroid of a set of key positions */
-function centroid(positions: number[]): { cx: number; cy: number } {
+function centroid(positions: number[], layout: KeyPosition[]): { cx: number; cy: number } {
   if (positions.length === 0) return { cx: 0, cy: 0 };
   let sx = 0;
   let sy = 0;
   for (const p of positions) {
-    const { cx, cy } = keyCenter(p);
+    const { cx, cy } = keyCenter(p, layout);
     sx += cx;
     sy += cy;
   }
@@ -92,16 +91,18 @@ function ComboLines({
   isSelected,
   labelPos,
   onClick,
+  layout,
 }: {
   combo: Combo;
   isSelected: boolean;
   labelPos: { cx: number; cy: number };
   onClick: () => void;
+  layout: KeyPosition[];
 }) {
   const color = isSelected ? "#f9e2af" : "#fab387";
   const opacity = isSelected ? 1 : 0.6;
   const strokeWidth = isSelected ? 0.5 : 0.35;
-  const centers = combo.positions.map(keyCenter);
+  const centers = combo.positions.map((p) => keyCenter(p, layout));
   const label = getKeyLabel(combo.binding);
   const displayText = label.top ? `${label.top} ${label.main}` : label.main;
   const pillWidth = Math.max(displayText.length * 1.8 + 2, 8);
@@ -179,20 +180,23 @@ export function ComboOverlay({
   onComboClick,
   pickingPositions,
   onPositionClick,
+  layout,
 }: ComboOverlayProps) {
+  const viewBox = computeViewBox(layout);
+
   // Compute centroids then de-overlap labels
-  const centroids = combos.map((c) => centroid(c.positions));
+  const centroids = combos.map((c) => centroid(c.positions, layout));
   const labelPositions = deoverlapLabels(centroids, 9, 15);
 
   return (
     <svg
-      viewBox={VIEWBOX}
-      class="w-full h-full absolute inset-0 pointer-events-none"
+      viewBox={viewBox}
+      className="w-full h-full absolute inset-0 pointer-events-none"
       xmlns="http://www.w3.org/2000/svg"
       style={{ zIndex: 10 }}
     >
       {/* Combo connection lines */}
-      <g class="pointer-events-auto">
+      <g className="pointer-events-auto">
         {combos.map((combo, i) => (
           <ComboLines
             key={i}
@@ -200,16 +204,17 @@ export function ComboOverlay({
             isSelected={selectedCombo === i}
             labelPos={labelPositions[i]}
             onClick={() => onComboClick(i)}
+            layout={layout}
           />
         ))}
       </g>
 
       {/* Position-picking highlights */}
       {pickingPositions && (
-        <g class="pointer-events-auto">
-          {LAYOUT.map((kp) => {
+        <g className="pointer-events-auto">
+          {layout.map((kp) => {
             const isPicked = pickingPositions.has(kp.index);
-            const { cx, cy } = keyCenter(kp.index);
+            const { cx, cy } = keyCenter(kp.index, layout);
             const hasRotation = kp.rot !== 0;
             const transform = hasRotation
               ? `rotate(${kp.rot}, ${kp.rx}, ${kp.ry})`

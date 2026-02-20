@@ -1,4 +1,4 @@
-// ── Shared types for the TOTEM keyboard configurator ─────────────────
+// ── Shared types for the Keysmith keyboard configurator ──────────────
 
 // ── Device & connection ─────────────────────────────────────────────
 
@@ -92,6 +92,28 @@ export interface MouseConfig {
   move_accel_exponent: number;
   scroll_time_to_max_ms: number;
   scroll_accel_exponent: number;
+}
+
+// ── Physical layout (from ZMK Studio protocol) ──────────────────────
+
+export interface PhysicalLayouts {
+  active_layout_index: number;
+  layouts: PhysicalLayout[];
+}
+
+export interface PhysicalLayout {
+  name: string;
+  keys: KeyPhysicalAttrs[];
+}
+
+export interface KeyPhysicalAttrs {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  r: number;
+  rx: number;
+  ry: number;
 }
 
 // ── Layer & Keymap ───────────────────────────────────────────────────

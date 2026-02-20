@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "preact/hooks";
+import { useState, useMemo, useCallback } from "react";
 import {
   KEYCODES,
   CATEGORY_LABELS,
@@ -11,6 +11,8 @@ import {
 } from "../lib/keycodes.ts";
 import type { KeycodeCategory, Action } from "../lib/keycodes.ts";
 import type { Binding } from "../lib/types.ts";
+import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 
 interface BindingPickerProps {
   binding: Binding;
@@ -32,11 +34,11 @@ function PillSelect({
   onChange: (v: string) => void;
 }) {
   return (
-    <div class="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1">
       {options.map((o) => (
         <button
           key={o.value}
-          class={`px-3 py-1.5 rounded text-sm transition-colors
+          className={`px-3 py-1.5 rounded text-sm transition-colors
             ${o.value === value
               ? "bg-primary text-surface"
               : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -71,20 +73,19 @@ function KeycodeGrid({
   }, [search, activeCategory]);
 
   return (
-    <div class="flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
       {/* Search */}
       <input
         type="text"
         placeholder="Search keycodes..."
         value={search}
-        onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
-        style="background:#1e1e2e;color:#cdd6f4"
-        class="px-3 py-1.5 rounded text-sm text-text
+        onChange={(e) => setSearch((e.target as HTMLInputElement).value)}
+        className="px-3 py-1.5 rounded text-sm text-text bg-surface
                border border-overlay/50 outline-none focus:border-primary
                placeholder:text-subtext/50"
       />
       {/* Category tabs */}
-      <div class="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1">
         <CategoryTab
           label="All"
           active={activeCategory === "all"}
@@ -100,11 +101,11 @@ function KeycodeGrid({
         ))}
       </div>
       {/* Keycode buttons — pure flex-wrap, no inline styles (WebKitGTK compat) */}
-      <div class="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1">
         {filtered.map((code) => (
           <button
             key={code}
-            class={`px-2 py-1.5 rounded text-sm font-mono text-center transition-colors
+            className={`px-2 py-1.5 rounded text-sm font-mono text-center transition-colors
               ${code === selected
                 ? "bg-primary text-surface"
                 : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -114,7 +115,7 @@ function KeycodeGrid({
           </button>
         ))}
         {filtered.length === 0 && (
-          <div class="text-subtext text-sm py-4">
+          <div className="text-subtext text-sm py-4">
             No matching keycodes
           </div>
         )}
@@ -134,7 +135,7 @@ function CategoryTab({
 }) {
   return (
     <button
-      class={`px-2 py-0.5 rounded text-xs transition-colors
+      className={`px-2 py-0.5 rounded text-xs transition-colors
         ${active
           ? "bg-primary/20 text-primary"
           : "text-subtext hover:text-text hover:bg-overlay/30"}`}
@@ -168,11 +169,11 @@ function BtSelector({
   onChange: (params: string[]) => void;
 }) {
   return (
-    <div class="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2">
       {[0, 1, 2, 3, 4].map((n) => (
         <button
           key={n}
-          class={`px-3 py-1.5 rounded text-sm transition-colors
+          className={`px-3 py-1.5 rounded text-sm transition-colors
             ${params[0] === "BT_SEL" && params[1] === String(n)
               ? "bg-primary text-surface"
               : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -182,7 +183,7 @@ function BtSelector({
         </button>
       ))}
       <button
-        class={`px-3 py-1.5 rounded text-sm transition-colors
+        className={`px-3 py-1.5 rounded text-sm transition-colors
           ${params[0] === "BT_CLR"
             ? "bg-primary text-surface"
             : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -191,7 +192,7 @@ function BtSelector({
         BT CLR
       </button>
       <button
-        class={`px-3 py-1.5 rounded text-sm transition-colors
+        className={`px-3 py-1.5 rounded text-sm transition-colors
           ${params[0] === "BT_CLR_ALL"
             ? "bg-primary text-surface"
             : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -200,7 +201,7 @@ function BtSelector({
         CLR ALL
       </button>
       <button
-        class={`px-3 py-1.5 rounded text-sm transition-colors
+        className={`px-3 py-1.5 rounded text-sm transition-colors
           ${params[0] === "BT_NXT"
             ? "bg-primary text-surface"
             : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -209,7 +210,7 @@ function BtSelector({
         BT NXT
       </button>
       <button
-        class={`px-3 py-1.5 rounded text-sm transition-colors
+        className={`px-3 py-1.5 rounded text-sm transition-colors
           ${params[0] === "BT_PRV"
             ? "bg-primary text-surface"
             : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -218,7 +219,7 @@ function BtSelector({
         BT PRV
       </button>
       <button
-        class={`px-3 py-1.5 rounded text-sm transition-colors
+        className={`px-3 py-1.5 rounded text-sm transition-colors
           ${params[0] === "BT_DISC"
             ? "bg-primary text-surface"
             : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -227,11 +228,11 @@ function BtSelector({
         BT DISC
       </button>
       {params[0] === "BT_DISC" && (
-        <div class="flex gap-1 w-full">
+        <div className="flex gap-1 w-full">
           {[0, 1, 2, 3, 4].map((n) => (
             <button
               key={n}
-              class={`px-2.5 py-1 rounded text-xs transition-colors
+              className={`px-2.5 py-1 rounded text-xs transition-colors
                 ${params[1] === String(n)
                   ? "bg-primary text-surface"
                   : "bg-surface text-text hover:bg-overlay/50"}`}
@@ -295,40 +296,19 @@ export function BindingPicker({ binding, position, layerNames, onSave, onClose }
     onSave({ action, params });
   }, [action, params, onSave]);
 
-  // Close on Escape
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onClose]);
-
-  // Close on overlay click
-  const handleOverlayClick = useCallback(
-    (e: MouseEvent) => {
-      if (e.target === e.currentTarget) onClose();
-    },
-    [onClose],
-  );
-
   return (
-    <div
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      onClick={handleOverlayClick}
-    >
-      {/* Modal — sized via top/bottom/left/right (WebKitGTK: width/max-width broken) */}
-      <div
-        class="fixed z-[51] bg-surface-alt rounded-lg shadow-2xl flex flex-col"
-        style="top:20vh;bottom:20vh;left:30vw;right:30vw"
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent
+        className="bg-surface-alt p-0 gap-0 flex flex-col max-w-4xl h-[60vh]"
+        showCloseButton={false}
       >
         {/* Header */}
-        <div class="flex items-center justify-between px-4 py-3 border-b border-overlay/30">
-          <h2 class="text-sm font-medium text-text">
-            Edit Key <span class="text-subtext">#{position}</span>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-overlay/30 shrink-0">
+          <h2 className="text-sm font-medium text-text">
+            Edit Key <span className="text-subtext">#{position}</span>
           </h2>
           <button
-            class="text-subtext hover:text-text text-2xl leading-none px-1"
+            className="text-subtext hover:text-text text-2xl leading-none px-1"
             onClick={onClose}
           >
             &times;
@@ -336,60 +316,62 @@ export function BindingPicker({ binding, position, layerNames, onSave, onClose }
         </div>
 
         {/* Body */}
-        <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-          {/* Action selector — grouped */}
-          <div class="flex flex-col gap-2">
-            <label class="text-xs text-subtext font-medium">Action</label>
-            {ACTION_GROUPS.map((group) => (
-              <div key={group.label} class="flex flex-col gap-1">
-                <span class="text-[10px] text-subtext/60 uppercase tracking-wider">{group.label}</span>
-                <div class="flex flex-wrap gap-1">
-                  {group.actions.map((a) => (
-                    <button
-                      key={a}
-                      class={`px-2 py-1 rounded text-xs transition-colors
-                        ${a === action
-                          ? "bg-primary text-surface"
-                          : "bg-surface text-subtext hover:text-text hover:bg-overlay/30"}`}
-                      onClick={() => handleActionChange(a)}
-                      title={ACTION_DESCRIPTIONS[a]}
-                    >
-                      {ACTION_LABELS[a]}
-                    </button>
-                  ))}
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-4 flex flex-col gap-4">
+            {/* Action selector — grouped */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs text-subtext font-medium">Action</label>
+              {ACTION_GROUPS.map((group) => (
+                <div key={group.label} className="flex flex-col gap-1">
+                  <span className="text-[10px] text-subtext/60 uppercase tracking-wider">{group.label}</span>
+                  <div className="flex flex-wrap gap-1">
+                    {group.actions.map((a) => (
+                      <button
+                        key={a}
+                        className={`px-2 py-1 rounded text-xs transition-colors
+                          ${a === action
+                            ? "bg-primary text-surface"
+                            : "bg-surface text-subtext hover:text-text hover:bg-overlay/30"}`}
+                        onClick={() => handleActionChange(a)}
+                        title={ACTION_DESCRIPTIONS[a]}
+                      >
+                        {ACTION_LABELS[a]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              ))}
+              {/* Description of selected action */}
+              <div className="text-xs text-subtext/80 italic">
+                {ACTION_DESCRIPTIONS[action]}
               </div>
-            ))}
-            {/* Description of selected action */}
-            <div class="text-xs text-subtext/80 italic">
-              {ACTION_DESCRIPTIONS[action]}
             </div>
-          </div>
 
-          {/* Params UI based on action type */}
-          <ActionParams
-            action={action}
-            params={params}
-            setParams={setParams}
-            layerNames={layerNames}
-          />
-        </div>
+            {/* Params UI based on action type */}
+            <ActionParams
+              action={action}
+              params={params}
+              setParams={setParams}
+              layerNames={layerNames}
+            />
+          </div>
+        </ScrollArea>
 
         {/* Footer: preview + buttons */}
-        <div class="px-4 py-3 border-t border-overlay/30 flex items-center justify-between gap-3">
-          <code class="text-xs text-subtext font-mono truncate">
+        <div className="px-4 py-3 border-t border-overlay/30 flex items-center justify-between gap-3 shrink-0">
+          <code className="text-xs text-subtext font-mono truncate">
             {bindingPreview(action, params)}
           </code>
-          <div class="flex gap-2 shrink-0">
+          <div className="flex gap-2 shrink-0">
             <button
-              class="px-4 py-1.5 rounded text-sm text-subtext hover:text-text
+              className="px-4 py-1.5 rounded text-sm text-subtext hover:text-text
                      hover:bg-overlay/30 transition-colors"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
-              class="px-4 py-1.5 rounded text-sm bg-primary text-surface
+              className="px-4 py-1.5 rounded text-sm bg-primary text-surface
                      font-medium hover:brightness-110 transition-all"
               onClick={handleSave}
             >
@@ -397,8 +379,8 @@ export function BindingPicker({ binding, position, layerNames, onSave, onClose }
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -420,7 +402,7 @@ function ActionParams({
   // No-param actions
   if (NO_PARAM_ACTIONS.has(action)) {
     return (
-      <div class="text-sm text-subtext italic">
+      <div className="text-sm text-subtext italic">
         No additional parameters needed.
       </div>
     );
@@ -429,8 +411,8 @@ function ActionParams({
   // Simple keypress
   if (action === "kp" || action === "kt") {
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Keycode</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Keycode</label>
         <KeycodeGrid
           selected={params[0] ?? ""}
           onSelect={(code) => setParams([code])}
@@ -442,17 +424,17 @@ function ActionParams({
   // Hold-tap: modifier + keycode
   if (HOLD_TAP_ACTIONS.has(action)) {
     return (
-      <div class="flex flex-col gap-3">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs text-subtext font-medium">Hold (Modifier)</label>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-subtext font-medium">Hold (Modifier)</label>
           <PillSelect
             options={MODIFIER_OPTIONS}
             value={params[0] ?? "LSHFT"}
             onChange={(v) => setParams([v, params[1] ?? "A"])}
           />
         </div>
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs text-subtext font-medium">Tap (Keycode)</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-subtext font-medium">Tap (Keycode)</label>
           <KeycodeGrid
             selected={params[1] ?? ""}
             onSelect={(code) => setParams([params[0] ?? "LSHFT", code])}
@@ -465,17 +447,17 @@ function ActionParams({
   // Layer-tap: layer + keycode
   if (action === "lt_th" || action === "lt") {
     return (
-      <div class="flex flex-col gap-3">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs text-subtext font-medium">Hold (Layer)</label>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-subtext font-medium">Hold (Layer)</label>
           <PillSelect
             options={layerOptions}
             value={params[0] ?? "0"}
             onChange={(v) => setParams([v, params[1] ?? "A"])}
           />
         </div>
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs text-subtext font-medium">Tap (Keycode)</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-subtext font-medium">Tap (Keycode)</label>
           <KeycodeGrid
             selected={params[1] ?? ""}
             onSelect={(code) => setParams([params[0] ?? "0", code])}
@@ -488,8 +470,8 @@ function ActionParams({
   // Layer toggle / momentary layer
   if (action === "tog" || action === "mo" || action === "sl" || action === "to") {
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Layer</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Layer</label>
         <PillSelect
           options={layerOptions}
           value={params[0] ?? "0"}
@@ -502,8 +484,8 @@ function ActionParams({
   // Sticky key
   if (action === "sk") {
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Modifier</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Modifier</label>
         <PillSelect
           options={MODIFIER_OPTIONS}
           value={params[0] ?? "LSHFT"}
@@ -516,8 +498,8 @@ function ActionParams({
   // Bluetooth
   if (action === "bt") {
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Bluetooth Action</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Bluetooth Action</label>
         <BtSelector params={params} onChange={setParams} />
       </div>
     );
@@ -531,8 +513,8 @@ function ActionParams({
       { label: "Bluetooth", value: "OUT_BLE" },
     ];
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Output Mode</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Output Mode</label>
         <PillSelect
           options={options}
           value={params[0] ?? "OUT_TOG"}
@@ -550,8 +532,8 @@ function ActionParams({
       { label: "EP_TOG", value: "EP_TOG" },
     ];
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Power Action</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Power Action</label>
         <PillSelect
           options={options}
           value={params[0] ?? "EP_TOG"}
@@ -568,8 +550,8 @@ function ActionParams({
       : ["SCRL_UP", "SCRL_DOWN", "SCRL_LEFT", "SCRL_RIGHT"]
     ).map((o) => ({ label: o, value: o }));
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Direction</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Direction</label>
         <PillSelect
           options={options}
           value={params[0] ?? options[0].value}
@@ -583,8 +565,8 @@ function ActionParams({
   if (action === "mkp") {
     const options = ["LCLK", "RCLK", "MCLK", "MB4", "MB5"].map((b) => ({ label: b, value: b }));
     return (
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs text-subtext font-medium">Mouse Button</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-subtext font-medium">Mouse Button</label>
         <PillSelect
           options={options}
           value={params[0] ?? "LCLK"}

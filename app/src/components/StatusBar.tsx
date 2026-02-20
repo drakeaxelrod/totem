@@ -1,7 +1,18 @@
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useState, useRef, useCallback } from "preact/hooks";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { PiBatteryFull, PiBatteryHigh, PiBatteryMedium, PiBatteryLow, PiBatteryEmpty } from "react-icons/pi";
+import { useStore } from "../store/index.ts";
 import type { OutputLine } from "./BuildConsole.tsx";
 import type { DeviceInfo, ConnectedDeviceInfo, ConnectionStatus } from "../lib/types.ts";
+
+function BatteryIcon({ level }: { level: number }) {
+  const props = { size: 18 };
+  if (level > 87) return <PiBatteryFull {...props} />;
+  if (level > 62) return <PiBatteryHigh {...props} />;
+  if (level > 37) return <PiBatteryMedium {...props} />;
+  if (level > 12) return <PiBatteryLow {...props} />;
+  return <PiBatteryEmpty {...props} />;
+}
 
 // ── Types ──
 
@@ -28,6 +39,7 @@ export function StatusBar({
   setBuildExpanded: (v: boolean) => void;
   building: boolean;
 }) {
+  const { behaviorsReady, showToast } = useStore();
   const [battery, setBattery] = useState<BatteryInfo | null>(null);
   const [lockState, setLockState] = useState<string | null>(null);
   const [toggling, setToggling] = useState(false);
@@ -62,26 +74,25 @@ export function StatusBar({
     };
   }, [status.state]);
 
-  // Auto-connect to first found device
-  useEffect(() => {
-    if (status.state !== "disconnected" || devices.length === 0) return;
-
-    const device = devices[0];
+  const connectTo = useCallback(async (device: DeviceInfo) => {
     onStatusChange({ state: "connecting", device });
+    try {
+      const info = await invoke<ConnectedDeviceInfo>("connect_device", {
+        deviceId: device.id,
+        transport: device.transport,
+      });
+      onStatusChange({ state: "connected", info, locked: true });
+    } catch (e) {
+      console.error("Connect failed:", e);
+      onStatusChange({ state: "disconnected" });
+    }
+  }, [onStatusChange]);
 
-    (async () => {
-      try {
-        const info = await invoke<ConnectedDeviceInfo>("connect_device", {
-          deviceId: device.id,
-          transport: device.transport,
-        });
-        onStatusChange({ state: "connected", info, locked: true });
-      } catch (e) {
-        console.error("Auto-connect failed:", e);
-        onStatusChange({ state: "disconnected" });
-      }
-    })();
-  }, [devices, status.state]);
+  // Auto-connect when exactly one device is found
+  useEffect(() => {
+    if (status.state !== "disconnected" || devices.length !== 1) return;
+    connectTo(devices[0]);
+  }, [devices, status.state, connectTo]);
 
   // Poll battery + lock when connected
   useEffect(() => {
@@ -184,7 +195,26 @@ export function StatusBar({
     onStatusChange({ state: "disconnected" });
   }, [onStatusChange]);
 
+  const handleSaveToDevice = async () => {
+    try {
+      await invoke("save_changes_live");
+      showToast("Saved to device");
+    } catch (e) {
+      showToast(`Save failed: ${e}`, "error");
+    }
+  };
+
+  const handleDiscardDevice = async () => {
+    try {
+      await invoke("discard_changes_live");
+      showToast("Device changes discarded");
+    } catch (e) {
+      showToast(`Discard failed: ${e}`, "error");
+    }
+  };
+
   const isLocked = lockState !== null && lockState !== "unlocked";
+  const isUnlocked = status.state === "connected" && !isLocked && behaviorsReady;
 
   const dotClass = {
     disconnected: "bg-overlay",
@@ -207,15 +237,15 @@ export function StatusBar({
   };
 
   return (
-    <div class="flex flex-col shrink-0">
+    <div className="flex flex-col shrink-0">
       {/* Build output (expandable above the bar) */}
       {buildExpanded && buildLines.length > 0 && (
         <div
           ref={outputRef}
-          class="bg-[#11111b] max-h-64 overflow-y-auto px-3 py-2 font-mono text-xs leading-relaxed border-t border-overlay/30"
+          className="bg-[#11111b] max-h-64 overflow-y-auto px-3 py-2 font-mono text-xs leading-relaxed border-t border-overlay/30"
         >
           {buildLines.map((line, i) => (
-            <div key={i} class={lineColor(line.kind)}>
+            <div key={i} className={lineColor(line.kind)}>
               {line.text || "\u00a0"}
             </div>
           ))}
@@ -223,17 +253,32 @@ export function StatusBar({
       )}
 
       {/* Status bar */}
-      <div class="flex items-center gap-4 px-4 h-7 bg-surface-alt border-t border-overlay/30 text-xs shrink-0">
+      <div className="flex items-center gap-4 px-4 h-7 bg-surface-alt border-t border-overlay/30 text-xs shrink-0">
         {/* Connection status */}
-        <div class="flex items-center gap-1.5 text-subtext">
-          <span class={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
-          {status.state === "disconnected" && "No device"}
-          {status.state === "scanning" && "Scanning..."}
+        <div className="flex items-center gap-1.5 text-subtext">
+          <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
+          {status.state === "disconnected" && devices.length === 0 && "No device"}
+          {status.state === "disconnected" && devices.length > 1 && (
+            <span className="flex items-center gap-2">
+              {devices.map((d) => (
+                <button
+                  key={d.id}
+                  className="text-text hover:text-primary transition-colors"
+                  onClick={() => connectTo(d)}
+                >
+                  {d.name}
+                  <span className="text-subtext ml-0.5">
+                    ({d.transport === "Usb" ? "USB" : "BLE"})
+                  </span>
+                </button>
+              ))}
+            </span>
+          )}
           {status.state === "connecting" && `Connecting to ${status.device.name}...`}
           {status.state === "connected" && (
-            <span class="text-text">
+            <span className="text-text">
               {status.info.name}
-              <span class="text-subtext ml-1">
+              <span className="text-subtext ml-1">
                 ({status.info.transport === "Usb" ? "USB" : "BLE"})
               </span>
             </span>
@@ -242,14 +287,13 @@ export function StatusBar({
 
         {/* Battery levels */}
         {battery && battery.levels.length > 0 && (
-          <div class="flex items-center gap-2 text-subtext">
+          <div className="flex items-center gap-2 text-subtext">
             {battery.levels.map((level, i) => {
               const color = level > 50 ? "text-[#a6e3a1]" : level > 20 ? "text-[#f9e2af]" : "text-[#f38ba8]";
-              const label = ["L", "R"][i] ?? `${i}`;
               return (
-                <span key={i} class="flex items-center gap-0.5">
-                  <span>{label}</span>
-                  <span class={color}>{level}%</span>
+                <span key={i} className={`flex items-center gap-1.5 ${color}`}>
+                  <BatteryIcon level={level} />
+                  {level}%
                 </span>
               );
             })}
@@ -259,24 +303,42 @@ export function StatusBar({
         {/* Lock state */}
         {lockState && (
           <button
-            class={`flex items-center gap-1 transition-colors ${
+            className={`flex items-center gap-1 transition-colors ${
               toggling ? "text-subtext cursor-wait" : "text-subtext hover:text-text"
             }`}
             onClick={handleToggleLock}
             disabled={toggling}
           >
-            Studio: <span class={isLocked ? "text-[#f9e2af]" : "text-[#a6e3a1]"}>
+            State: <span className={isLocked ? "text-[#f9e2af]" : "text-[#a6e3a1]"}>
               {toggling && isLocked ? "Confirm on keyboard..." : isLocked ? "Locked" : "Unlocked"}
             </span>
           </button>
         )}
 
-        <div class="flex-1" />
+        {/* Device save/discard (only when unlocked) */}
+        {isUnlocked && (
+          <>
+            <button
+              className="text-[#a6e3a1] hover:text-[#a6e3a1]/80 transition-colors"
+              onClick={handleSaveToDevice}
+            >
+              Save
+            </button>
+            <button
+              className="text-[#f9e2af] hover:text-[#f9e2af]/80 transition-colors"
+              onClick={handleDiscardDevice}
+            >
+              Discard
+            </button>
+          </>
+        )}
+
+        <div className="flex-1" />
 
         {/* Build status */}
         {hasBuild && (
           <button
-            class={`flex items-center gap-1 transition-colors ${
+            className={`flex items-center gap-1 transition-colors ${
               building
                 ? "text-[#f9e2af]"
                 : buildExitCode === 0
@@ -290,7 +352,7 @@ export function StatusBar({
               : buildExitCode === 0
                 ? "Build: OK"
                 : `Build: Failed (${buildExitCode})`}
-            <span class="text-subtext">{buildExpanded ? "▾" : "▸"}</span>
+            <span className="text-subtext">{buildExpanded ? "\u25BE" : "\u25B8"}</span>
           </button>
         )}
 
@@ -298,14 +360,14 @@ export function StatusBar({
         {status.state === "connected" && (
           <>
             <button
-              class="text-subtext hover:text-[#f9e2af] transition-colors"
+              className="text-subtext hover:text-[#f9e2af] transition-colors"
               onClick={handleReconnect}
               title="Disconnect and reconnect"
             >
               Reconnect
             </button>
             <button
-              class="text-subtext hover:text-[#f38ba8] transition-colors"
+              className="text-subtext hover:text-[#f38ba8] transition-colors"
               onClick={handleDisconnect}
             >
               Disconnect

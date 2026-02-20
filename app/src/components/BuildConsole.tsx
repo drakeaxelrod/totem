@@ -1,5 +1,5 @@
 import { invoke, Channel } from "@tauri-apps/api/core";
-import { useState, useCallback } from "preact/hooks";
+import { useState, useCallback } from "react";
 
 type BuildEvent =
   | { event: "stdout"; data: { line: string } }

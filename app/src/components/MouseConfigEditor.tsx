@@ -12,12 +12,12 @@ export function MouseConfigEditor({ config, onChange }: MouseConfigEditorProps) 
   };
 
   return (
-    <div class="flex flex-col gap-4 p-3">
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-semibold text-text tracking-wide uppercase">Move</span>
-        <div class="h-px bg-overlay/30" />
+    <div className="flex flex-col gap-4 p-3">
+      <div className="flex flex-col gap-1">
+        <span className="text-xs font-semibold text-text tracking-wide uppercase">Move</span>
+        <div className="h-px bg-overlay/30" />
       </div>
-      <div class="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <NumberField
           label="Default speed"
           value={config.move_speed}
@@ -36,11 +36,11 @@ export function MouseConfigEditor({ config, onChange }: MouseConfigEditorProps) 
         />
       </div>
 
-      <div class="flex flex-col gap-1 mt-2">
-        <span class="text-xs font-semibold text-text tracking-wide uppercase">Scroll</span>
-        <div class="h-px bg-overlay/30" />
+      <div className="flex flex-col gap-1 mt-2">
+        <span className="text-xs font-semibold text-text tracking-wide uppercase">Scroll</span>
+        <div className="h-px bg-overlay/30" />
       </div>
-      <div class="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <NumberField
           label="Default speed"
           value={config.scroll_speed}

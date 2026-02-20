@@ -1,5 +1,5 @@
 import type { KeyPosition } from "../lib/layout.ts";
-import { LAYOUT } from "../lib/layout.ts";
+import { computeViewBox } from "../lib/layout.ts";
 import { getKeyLabel } from "../lib/keyLabels.ts";
 
 interface KeyboardSvgProps {
@@ -7,6 +7,7 @@ interface KeyboardSvgProps {
     name: string;
     bindings: Array<{ action: string; params: string[] }>;
   };
+  layout: KeyPosition[];
   onKeyClick?: (pos: number) => void;
   onKeyContextMenu?: (pos: number, x: number, y: number) => void;
   highlightedKeys?: Set<number>;
@@ -59,9 +60,6 @@ function getTextColor(action: string): { main: string; sub: string } {
   return { main: "#1e1e2e", sub: "#313244" };
 }
 
-const PADDING = 2;
-const VIEWBOX = `${-PADDING} ${-PADDING} ${150.3 + PADDING * 2} ${53.3 + PADDING * 2}`;
-
 function Key({
   keyPos,
   binding,
@@ -71,7 +69,7 @@ function Key({
   keyPos: KeyPosition;
   binding: { action: string; params: string[] };
   onClick?: () => void;
-  onContextMenu?: (e: MouseEvent) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }) {
   const { x, y, w, h, rot, rx, ry } = keyPos;
   const color = getKeyColor(binding.action);
@@ -100,7 +98,7 @@ function Key({
       onClick={onClick}
       onContextMenu={onContextMenu}
       style={{ cursor: onClick ? "pointer" : "default" }}
-      class="key-group"
+      className="key-group"
     >
       <rect
         x={rectX}
@@ -111,7 +109,7 @@ function Key({
         ry={0.8}
         fill={color}
         stroke="#585b70"
-        stroke-width={0.2}
+        strokeWidth={0.2}
         opacity={isTransparent ? 0.4 : 1}
       />
       {label.top ? (
@@ -119,23 +117,23 @@ function Key({
           <text
             x={cx}
             y={cy - 1.4}
-            text-anchor="middle"
-            dominant-baseline="central"
+            textAnchor="middle"
+            dominantBaseline="central"
             fill={textColor.sub}
-            font-size="2.4"
-            font-family="LilexMono, Lilex Nerd Font Mono, monospace"
+            fontSize="2.4"
+            fontFamily="LilexMono, Lilex Nerd Font Mono, monospace"
           >
             {label.top}
           </text>
           <text
             x={cx}
             y={cy + 2.2}
-            text-anchor="middle"
-            dominant-baseline="central"
+            textAnchor="middle"
+            dominantBaseline="central"
             fill={textColor.main}
-            font-size={isIcon(label.main) ? "4" : "3"}
-            font-family="LilexMono, Lilex Nerd Font Mono, monospace"
-            font-weight="500"
+            fontSize={isIcon(label.main) ? "4" : "3"}
+            fontFamily="LilexMono, Lilex Nerd Font Mono, monospace"
+            fontWeight="500"
           >
             {label.main}
           </text>
@@ -144,12 +142,12 @@ function Key({
         <text
           x={cx}
           y={cy}
-          text-anchor="middle"
-          dominant-baseline="central"
+          textAnchor="middle"
+          dominantBaseline="central"
           fill={isTransparent ? "#585b70" : textColor.main}
-          font-size={isIcon(label.main) ? "4.5" : label.main.length > 3 ? "2.4" : "3"}
-          font-family="LilexMono, Lilex Nerd Font Mono, monospace"
-          font-weight="500"
+          fontSize={isIcon(label.main) ? "4.5" : label.main.length > 3 ? "2.4" : "3"}
+          fontFamily="LilexMono, Lilex Nerd Font Mono, monospace"
+          fontWeight="500"
         >
           {label.main}
         </text>
@@ -158,11 +156,13 @@ function Key({
   );
 }
 
-export function KeyboardSvg({ layer, onKeyClick, onKeyContextMenu, highlightedKeys }: KeyboardSvgProps) {
+export function KeyboardSvg({ layer, layout, onKeyClick, onKeyContextMenu, highlightedKeys }: KeyboardSvgProps) {
+  const viewBox = computeViewBox(layout);
+
   return (
     <svg
-      viewBox={VIEWBOX}
-      class="w-full h-full"
+      viewBox={viewBox}
+      className="w-full h-full"
       xmlns="http://www.w3.org/2000/svg"
     >
       <style>{`
@@ -174,19 +174,19 @@ export function KeyboardSvg({ layer, onKeyClick, onKeyContextMenu, highlightedKe
           stroke-width: 0.5;
         }
       `}</style>
-      {LAYOUT.map((keyPos) => {
+      {layout.map((keyPos) => {
         const binding = layer.bindings[keyPos.index];
         if (!binding) return null;
         const isHighlighted = highlightedKeys?.has(keyPos.index) ?? false;
         return (
-          <g key={keyPos.index} class={isHighlighted ? "key-highlight" : ""}>
+          <g key={keyPos.index} className={isHighlighted ? "key-highlight" : ""}>
             <Key
               keyPos={keyPos}
               binding={binding}
               onClick={onKeyClick ? () => onKeyClick(keyPos.index) : undefined}
               onContextMenu={
                 onKeyContextMenu
-                  ? (e: MouseEvent) => {
+                  ? (e: React.MouseEvent) => {
                       e.preventDefault();
                       onKeyContextMenu(keyPos.index, e.clientX, e.clientY);
                     }

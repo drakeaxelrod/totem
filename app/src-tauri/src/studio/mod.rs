@@ -194,7 +194,6 @@ impl StudioClient {
     }
 
     /// Get physical layouts from the device.
-    #[allow(dead_code)]
     pub async fn get_physical_layouts(&self) -> Result<keymap::PhysicalLayouts, String> {
         let req = self.make_request(studio::request::Subsystem::Keymap(keymap::Request {
             request_type: Some(keymap::request::RequestType::GetPhysicalLayouts(true)),
@@ -419,6 +418,57 @@ impl LiveKeymap {
                 .collect(),
             available_layers: km.available_layers,
             max_layer_name_length: km.max_layer_name_length,
+        }
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct LivePhysicalLayouts {
+    pub active_layout_index: u32,
+    pub layouts: Vec<LivePhysicalLayout>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct LivePhysicalLayout {
+    pub name: String,
+    pub keys: Vec<LiveKeyPhysicalAttrs>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct LiveKeyPhysicalAttrs {
+    pub x: i32,
+    pub y: i32,
+    pub width: i32,
+    pub height: i32,
+    pub r: i32,
+    pub rx: i32,
+    pub ry: i32,
+}
+
+impl LivePhysicalLayouts {
+    pub fn from_proto(pl: keymap::PhysicalLayouts) -> Self {
+        Self {
+            active_layout_index: pl.active_layout_index,
+            layouts: pl
+                .layouts
+                .into_iter()
+                .map(|l| LivePhysicalLayout {
+                    name: l.name,
+                    keys: l
+                        .keys
+                        .into_iter()
+                        .map(|k| LiveKeyPhysicalAttrs {
+                            x: k.x,
+                            y: k.y,
+                            width: k.width,
+                            height: k.height,
+                            r: k.r,
+                            rx: k.rx,
+                            ry: k.ry,
+                        })
+                        .collect(),
+                })
+                .collect(),
         }
     }
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "preact/hooks";
+import { useState, useCallback } from "react";
 import type {
   Binding,
   HoldTapBehavior,
@@ -72,16 +72,16 @@ function OptionalNumberField({
   const enabled = value !== null;
 
   return (
-    <div class="flex flex-col gap-1">
-      <label class="text-sm text-subtext font-medium">{label}</label>
-      <div class="flex items-center gap-1.5">
+    <div className="flex flex-col gap-1">
+      <label className="text-sm text-subtext font-medium">{label}</label>
+      <div className="flex items-center gap-1.5">
         <input
           type="checkbox"
           checked={enabled}
           onChange={(e) => {
             onChange((e.target as HTMLInputElement).checked ? 150 : null);
           }}
-          class="accent-primary"
+          className="accent-primary"
         />
         {enabled ? (
           <>
@@ -89,17 +89,17 @@ function OptionalNumberField({
               type="number"
               value={value}
               min={0}
-              onInput={(e) => {
+              onChange={(e) => {
                 const v = parseInt((e.target as HTMLInputElement).value, 10);
                 if (!isNaN(v)) onChange(v);
               }}
-              class="w-24 px-2 py-1 bg-surface rounded text-sm text-text font-mono
+              className="w-24 px-2 py-1 bg-surface rounded text-sm text-text font-mono
                      border border-overlay/50 outline-none focus:border-primary"
             />
-            {suffix && <span class="text-sm text-subtext">{suffix}</span>}
+            {suffix && <span className="text-sm text-subtext">{suffix}</span>}
           </>
         ) : (
-          <span class="text-sm text-subtext italic">disabled</span>
+          <span className="text-sm text-subtext italic">disabled</span>
         )}
       </div>
     </div>
@@ -123,12 +123,12 @@ function HoldTapEditor({
   };
 
   return (
-    <div class="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {/* Flavor */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">Flavor</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">Flavor</label>
         <select
-          class="px-2 py-1 bg-surface rounded text-sm text-text
+          className="px-2 py-1 bg-surface rounded text-sm text-text
                  border border-overlay/50 outline-none focus:border-primary"
           value={behavior.flavor}
           onChange={(e) =>
@@ -144,7 +144,7 @@ function HoldTapEditor({
       </div>
 
       {/* Timing parameters */}
-      <div class="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <NumberField
           label="Tapping term"
           value={behavior.tapping_term_ms}
@@ -168,7 +168,7 @@ function HoldTapEditor({
       />
 
       {/* Hold trigger on release */}
-      <div class="flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <input
           type="checkbox"
           checked={behavior.hold_trigger_on_release}
@@ -178,16 +178,16 @@ function HoldTapEditor({
               (e.target as HTMLInputElement).checked,
             )
           }
-          class="accent-primary"
+          className="accent-primary"
         />
-        <label class="text-sm text-subtext font-medium">
+        <label className="text-sm text-subtext font-medium">
           Hold trigger on release
         </label>
       </div>
 
       {/* Hold trigger key positions */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">
           Hold trigger key positions
         </label>
         <input
@@ -198,7 +198,7 @@ function HoldTapEditor({
               : ""
           }
           placeholder="e.g. 0, 1, 2, 3, 4"
-          onInput={(e) => {
+          onChange={(e) => {
             const raw = (e.target as HTMLInputElement).value.trim();
             if (raw === "") {
               update("hold_trigger_key_positions", null);
@@ -210,25 +210,25 @@ function HoldTapEditor({
               update("hold_trigger_key_positions", positions);
             }
           }}
-          class="px-2 py-1 bg-surface rounded text-sm text-text font-mono
+          className="px-2 py-1 bg-surface rounded text-sm text-text font-mono
                  border border-overlay/50 outline-none focus:border-primary"
         />
-        <span class="text-sm text-subtext/70">
+        <span className="text-sm text-subtext/70">
           Comma-separated position numbers, or empty for none
         </span>
       </div>
 
       {/* Hold / Tap bindings (read-only info) */}
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1">
-          <label class="text-sm text-subtext font-medium">Hold binding</label>
-          <code class="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-subtext font-medium">Hold binding</label>
+          <code className="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
             {behavior.hold_bindings}
           </code>
         </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-sm text-subtext font-medium">Tap binding</label>
-          <code class="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-subtext font-medium">Tap binding</label>
+          <code className="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
             {behavior.tap_bindings}
           </code>
         </div>
@@ -241,27 +241,27 @@ function HoldTapEditor({
 
 function ModMorphEditor({ behavior }: { behavior: ModMorphBehavior }) {
   return (
-    <div class="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {/* Normal binding */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">Normal binding</label>
-        <code class="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">Normal binding</label>
+        <code className="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
           {formatBinding(behavior.normal)}
         </code>
       </div>
 
       {/* Shifted binding */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">Shifted binding</label>
-        <code class="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">Shifted binding</label>
+        <code className="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
           {formatBinding(behavior.shifted)}
         </code>
       </div>
 
       {/* Mods */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">Modifier mask</label>
-        <code class="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">Modifier mask</label>
+        <code className="px-2 py-1 bg-surface rounded text-sm text-text font-mono">
           {behavior.mods}
         </code>
       </div>
@@ -286,9 +286,9 @@ function MacroEditor({
   };
 
   return (
-    <div class="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {/* Timing */}
-      <div class="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <NumberField
           label="Wait"
           value={behavior.wait_ms}
@@ -304,19 +304,19 @@ function MacroEditor({
       </div>
 
       {/* Binding sequence */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">Binding sequence</label>
-        <div class="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">Binding sequence</label>
+        <div className="flex flex-col gap-0.5">
           {behavior.bindings.map((b, i) => (
             <code
               key={i}
-              class="px-2 py-0.5 bg-surface rounded text-sm text-text font-mono"
+              className="px-2 py-0.5 bg-surface rounded text-sm text-text font-mono"
             >
               {formatBinding(b)}
             </code>
           ))}
           {behavior.bindings.length === 0 && (
-            <span class="text-sm text-subtext italic">No bindings</span>
+            <span className="text-sm text-subtext italic">No bindings</span>
           )}
         </div>
       </div>
@@ -341,7 +341,7 @@ function TapDanceEditor({
   };
 
   return (
-    <div class="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {/* Tapping term */}
       <NumberField
         label="Tapping term"
@@ -351,21 +351,21 @@ function TapDanceEditor({
       />
 
       {/* Binding sequence */}
-      <div class="flex flex-col gap-1">
-        <label class="text-sm text-subtext font-medium">
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-subtext font-medium">
           Bindings ({behavior.bindings.length} tap{behavior.bindings.length !== 1 ? "s" : ""})
         </label>
-        <div class="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-0.5">
           {behavior.bindings.map((b, i) => (
-            <div key={i} class="flex items-center gap-2">
-              <span class="text-xs text-subtext w-4 text-right">{i + 1}.</span>
-              <code class="px-2 py-0.5 bg-surface rounded text-sm text-text font-mono">
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-xs text-subtext w-4 text-right">{i + 1}.</span>
+              <code className="px-2 py-0.5 bg-surface rounded text-sm text-text font-mono">
                 {formatBinding(b)}
               </code>
             </div>
           ))}
           {behavior.bindings.length === 0 && (
-            <span class="text-sm text-subtext italic">No bindings</span>
+            <span className="text-sm text-subtext italic">No bindings</span>
           )}
         </div>
       </div>
@@ -387,30 +387,30 @@ function BehaviorCard({
   onChange: (b: Behavior) => void;
 }) {
   return (
-    <div class="border border-overlay/30 rounded-lg overflow-hidden">
+    <div className="border border-overlay/30 rounded-lg overflow-hidden">
       {/* Card header */}
       <button
-        class="w-full flex items-center gap-2 px-3 py-2 bg-surface hover:bg-overlay/20
+        className="w-full flex items-center gap-2 px-3 py-2 bg-surface hover:bg-overlay/20
                transition-colors text-left"
         onClick={onToggle}
       >
         <span
-          class={`text-xs transition-transform ${expanded ? "rotate-90" : ""}`}
+          className={`text-xs transition-transform ${expanded ? "rotate-90" : ""}`}
         >
           &#9654;
         </span>
-        <span class="text-sm font-medium text-text">{behavior.name}</span>
-        <span class={`text-sm font-medium ${behaviorTypeColor(behavior.type)}`}>
+        <span className="text-sm font-medium text-text">{behavior.name}</span>
+        <span className={`text-sm font-medium ${behaviorTypeColor(behavior.type)}`}>
           {behaviorTypeLabel(behavior.type)}
         </span>
         {behavior.label && (
-          <span class="text-sm text-subtext ml-auto">{behavior.label}</span>
+          <span className="text-sm text-subtext ml-auto">{behavior.label}</span>
         )}
       </button>
 
       {/* Card body */}
       {expanded && (
-        <div class="px-3 py-3 bg-surface-alt border-t border-overlay/20">
+        <div className="px-3 py-3 bg-surface-alt border-t border-overlay/20">
           {behavior.type === "HoldTap" && (
             <HoldTapEditor
               behavior={behavior}
@@ -459,8 +459,8 @@ export function BehaviorEditor({ behaviors, onChange }: BehaviorEditorProps) {
   );
 
   return (
-    <div class="flex flex-col h-full">
-      <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
         {behaviors.map((b, i) => (
           <BehaviorCard
             key={b.name}
@@ -471,7 +471,7 @@ export function BehaviorEditor({ behaviors, onChange }: BehaviorEditorProps) {
           />
         ))}
         {behaviors.length === 0 && (
-          <div class="text-sm text-subtext italic text-center py-8">
+          <div className="text-sm text-subtext italic text-center py-8">
             No behaviors defined
           </div>
         )}

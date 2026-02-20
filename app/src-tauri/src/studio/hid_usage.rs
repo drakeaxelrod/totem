@@ -362,6 +362,49 @@ pub fn hid_to_keycode(usage: u32) -> Option<&'static str> {
     HID_TO_NAME.get(&usage).copied()
 }
 
+/// Reverse lookup that also handles modifier-wrapped HID codes.
+/// Returns the canonical name (e.g. "EXCL") for known shifted symbols,
+/// or wraps with modifier prefixes (e.g. "LS(A)") for ad-hoc composites.
+/// Falls back to hex string for completely unknown HID values.
+pub fn hid_to_keycode_with_modifiers(hid: u32) -> String {
+    // Try direct lookup first (handles named shifted symbols like EXCL, PIPE, etc.)
+    if let Some(name) = hid_to_keycode(hid) {
+        return name.to_string();
+    }
+
+    // Extract modifier bits from upper byte
+    let mod_bits = (hid >> 24) & 0xFF;
+    let base_hid = hid & 0x00FF_FFFF;
+
+    if mod_bits == 0 {
+        return format!("0x{hid:08X}");
+    }
+
+    let base_name = match hid_to_keycode(base_hid) {
+        Some(name) => name.to_string(),
+        None => return format!("0x{hid:08X}"),
+    };
+
+    // Wrap with modifier prefixes (inner → outer order)
+    let mut result = base_name;
+    const WRAP_ORDER: &[(u32, &str)] = &[
+        (MOD_RSFT, "RS"),
+        (MOD_RCTL, "RC"),
+        (MOD_RALT, "RA"),
+        (MOD_RGUI, "RG"),
+        (MOD_LSFT, "LS"),
+        (MOD_LCTL, "LC"),
+        (MOD_LALT, "LA"),
+        (MOD_LGUI, "LG"),
+    ];
+    for &(bit, prefix) in WRAP_ORDER {
+        if mod_bits & bit != 0 {
+            result = format!("{prefix}({result})");
+        }
+    }
+    result
+}
+
 /// Parse a keycode string that may include modifier wrappers.
 /// Examples: `"A"` → 0x70004, `"LS(N1)"` → 0x0207001E, `"LC(LS(A))"` → 0x030070004
 pub fn parse_keycode_with_modifiers(text: &str) -> Option<u32> {

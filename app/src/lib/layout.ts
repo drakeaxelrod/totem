@@ -9,7 +9,17 @@ export interface KeyPosition {
   ry: number;
 }
 
-// Physical layout from totem-layout.dtsi
+export function computeViewBox(layout: KeyPosition[], padding = 2): string {
+  let maxX = 0;
+  let maxY = 0;
+  for (const k of layout) {
+    maxX = Math.max(maxX, k.x + k.w);
+    maxY = Math.max(maxY, k.y + k.h);
+  }
+  return `${-padding} ${-padding} ${maxX + padding * 2} ${maxY + padding * 2}`;
+}
+
+// Physical layout from totem-layout.dtsi (fallback when disconnected)
 // All coordinates scaled /10 from centiunits, rotation /100 from centidegrees
 export const LAYOUT: KeyPosition[] = [
   { index: 0,  x: 7.8,   y: 15.2,  w: 10.6, h: 10, rot: -10,  rx: 13,    ry: 20.2  },
