@@ -135,7 +135,7 @@ export function App() {
 
       <div className="flex-1 min-h-0 flex overflow-hidden">
         <KeyboardView />
-        <Sidebar />
+        {liveKeymap && <Sidebar />}
       </div>
 
       <StatusBar

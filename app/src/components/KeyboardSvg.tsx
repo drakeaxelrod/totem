@@ -175,8 +175,7 @@ export function KeyboardSvg({ layer, layout, onKeyClick, onKeyContextMenu, highl
         }
       `}</style>
       {layout.map((keyPos) => {
-        const binding = layer.bindings[keyPos.index];
-        if (!binding) return null;
+        const binding = layer.bindings[keyPos.index] ?? { action: "none", params: [] };
         const isHighlighted = highlightedKeys?.has(keyPos.index) ?? false;
         return (
           <g key={keyPos.index} className={isHighlighted ? "key-highlight" : ""}>

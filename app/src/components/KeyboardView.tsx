@@ -9,11 +9,11 @@ export function KeyboardView() {
     renamingLayer, renameValue,
     keyContextMenu, layerContextMenu,
     physicalLayout, liveKeymap,
-    setActiveLayer, selectKey, toggleComboOverlay,
+    setActiveLayer, selectKey,
     selectCombo, togglePosition,
     setRenamingLayer, setRenameValue,
     setKeyContextMenu, setLayerContextMenu,
-    addLayer, deleteLayer, renameLayer: storeRenameLayer, duplicateLayer,
+    deleteLayer, renameLayer: storeRenameLayer, duplicateLayer,
     setBinding, pasteBinding, copyBinding, clipboard,
   } = useStore();
 
@@ -22,9 +22,10 @@ export function KeyboardView() {
   // Only use the device's physical layout — no fallback
   const layout = physicalLayout;
 
-  // Use live keymap from device when available, local keymap as fallback
-  const displayLayers = liveKeymap ?? keymap.layers;
-  const safeActiveLayer = Math.min(activeLayer, displayLayers.length - 1);
+  // Only show content when device data is available
+  const displayLayers = liveKeymap;
+  const connected = layout !== null && displayLayers !== null;
+  const safeActiveLayer = connected ? Math.min(activeLayer, displayLayers.length - 1) : 0;
 
   // ── Handlers ──
 
@@ -42,6 +43,7 @@ export function KeyboardView() {
   };
 
   const handleStartRename = (index: number) => {
+    if (!displayLayers) return;
     setRenamingLayer(index);
     setRenameValue(displayLayers[index].name);
   };
@@ -61,6 +63,14 @@ export function KeyboardView() {
   if (selectedCombo !== null) {
     const combo = keymap.combos[selectedCombo];
     if (combo) for (const p of combo.positions) highlightedKeys.add(p);
+  }
+
+  if (!connected) {
+    return (
+      <div style={{ flex: "1 1 0%" }} className="min-w-0 min-h-0 flex flex-col items-center justify-center overflow-hidden">
+        <span className="text-subtext text-sm">Connect a device to get started</span>
+      </div>
+    );
   }
 
   return (
@@ -118,55 +128,29 @@ export function KeyboardView() {
             )}
           </div>
         ))}
-        <button
-          className="px-1.5 py-0.5 rounded text-xs transition-colors
-                 text-subtext hover:text-text hover:bg-overlay/20"
-          onClick={addLayer}
-          title="Add layer"
-        >
-          +
-        </button>
-
-        <div className="flex-1" />
-
-        <button
-          className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-            showComboOverlay
-              ? "bg-[#fab387]/20 text-[#fab387]"
-              : "text-subtext hover:text-text hover:bg-overlay/20"
-          }`}
-          onClick={toggleComboOverlay}
-          title="Toggle combo overlay"
-        >
-          Combos
-        </button>
       </div>
 
       {/* Keyboard SVG area */}
       <div className="flex-1 flex items-center justify-center p-6 min-h-0">
-        {layout ? (
-          <div className="relative w-full h-full">
-            <KeyboardSvg
-              layer={displayLayers[safeActiveLayer]}
+        <div className="relative w-full h-full">
+          <KeyboardSvg
+            layer={displayLayers[safeActiveLayer]}
+            layout={layout}
+            onKeyClick={handleKeyClick}
+            onKeyContextMenu={handleKeyContextMenu}
+            highlightedKeys={highlightedKeys.size > 0 ? highlightedKeys : undefined}
+          />
+          {(showComboOverlay || selectedCombo !== null) && (
+            <ComboOverlay
+              combos={keymap.combos}
+              selectedCombo={selectedCombo}
+              onComboClick={(index) => selectCombo(index)}
+              pickingPositions={isPickingPositions ? pickingPositions : null}
+              onPositionClick={(pos) => { if (isPickingPositions) togglePosition(pos); }}
               layout={layout}
-              onKeyClick={handleKeyClick}
-              onKeyContextMenu={handleKeyContextMenu}
-              highlightedKeys={highlightedKeys.size > 0 ? highlightedKeys : undefined}
             />
-            {(showComboOverlay || selectedCombo !== null) && (
-              <ComboOverlay
-                combos={keymap.combos}
-                selectedCombo={selectedCombo}
-                onComboClick={(index) => selectCombo(index)}
-                pickingPositions={isPickingPositions ? pickingPositions : null}
-                onPositionClick={(pos) => { if (isPickingPositions) togglePosition(pos); }}
-                layout={layout}
-              />
-            )}
-          </div>
-        ) : (
-          <span className="text-subtext text-sm">Connect a device to view its layout</span>
-        )}
+          )}
+        </div>
       </div>
 
       {/* ── Layer context menu ── */}

@@ -297,8 +297,8 @@ fn action_to_display_name(action: &str) -> Option<&'static str> {
         "caps_word" => "caps word",
         "key_repeat" => "key repeat",
         "mkp" => "mouse key press",
-        "mmv" => "mouse move",
-        "msc" => "mouse scroll",
+        "mmv" => "mouse_move",
+        "msc" => "mouse_scroll",
         "bt" => "bluetooth",
         "out" => "output selection",
         "soft_off" => "soft off",
@@ -306,6 +306,13 @@ fn action_to_display_name(action: &str) -> Option<&'static str> {
         "sys_reset" => "reset",
         "ext_power" => "external power",
         "studio_unlock" => "studio unlock",
+        // Custom behaviors (device-specific display names)
+        "hml" => "home_row_mod_left",
+        "hmr" => "home_row_mod_right",
+        "lt_th" => "layer_tap_thumb",
+        "comma_morph" => "comma_semicolon",
+        "dot_morph" => "dot_colon",
+        "fat_arrow" => "fat_arrow",
         _ => return None,
     })
 }
@@ -461,8 +468,6 @@ fn display_name_to_action(display_name: &str) -> Option<&'static str> {
         "caps word" => "caps_word",
         "key repeat" => "key_repeat",
         "mouse key press" => "mkp",
-        "mouse move" => "mmv",
-        "mouse scroll" => "msc",
         "bluetooth" => "bt",
         "output selection" => "out",
         "soft off" => "soft_off",
@@ -470,6 +475,15 @@ fn display_name_to_action(display_name: &str) -> Option<&'static str> {
         "reset" => "sys_reset",
         "external power" => "ext_power",
         "studio unlock" => "studio_unlock",
+        // Custom behaviors (device-specific display names with underscores)
+        "home_row_mod_left" => "hml",
+        "home_row_mod_right" => "hmr",
+        "layer_tap_thumb" => "lt_th",
+        "comma_semicolon" => "comma_morph",
+        "dot_colon" => "dot_morph",
+        "fat_arrow" => "fat_arrow",
+        "mouse_move" => "mmv",
+        "mouse_scroll" => "msc",
         _ => return None,
     })
 }
@@ -556,6 +570,15 @@ async fn get_resolved_keymap(state: State<'_, AppState>) -> Result<ResolvedKeyma
     let guard = state.client.lock().await;
     let client = guard.as_ref().ok_or("Not connected")?;
     let km = client.get_keymap().await?;
+
+    println!(
+        "get_resolved_keymap: device returned {} layers (available_layers={})",
+        km.layers.len(),
+        km.available_layers
+    );
+    for l in &km.layers {
+        println!("  layer id={} name={:?} bindings={}", l.id, l.name, l.bindings.len());
+    }
 
     let layers = km
         .layers

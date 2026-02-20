@@ -68,6 +68,8 @@ export const createConnectionSlice: StateCreator<
   fetchLiveKeymap: async () => {
     try {
       const resolved = await invoke<ResolvedKeymap>("get_resolved_keymap");
+      console.log("fetchLiveKeymap: received", resolved.layers.length, "layers",
+        resolved.layers.map(l => `${l.name}(id=${l.id}, bindings=${l.bindings.length})`));
       const layers: Layer[] = resolved.layers.map((l) => ({
         name: l.name,
         index: l.id,
