@@ -293,7 +293,7 @@
       <text x="5" y="-20" class="label" font-size="16">Game</text>
       <g transform="translate(78, 113) rotate(-10.0)" class="key keypos-0">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">Esc</text>
+        <text x="0" y="0" class="key tap">Tab</text>
       </g>
       <g transform="translate(144, 62) rotate(-4.0)" class="key keypos-1">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
@@ -305,11 +305,11 @@
       </g>
       <g transform="translate(271, 56)" class="key keypos-3">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">R</text>
+        <text x="0" y="0" class="key tap">E</text>
       </g>
       <g transform="translate(330, 65)" class="key keypos-4">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">T</text>
+        <text x="0" y="0" class="key tap">R</text>
       </g>
       <g transform="translate(520, 65)" class="key keypos-5">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
@@ -373,30 +373,27 @@
       </g>
       <g transform="translate(34, 209) rotate(-10.0)" class="key keypos-20">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">Tab</text>
+        <text x="0" y="0" class="key tap">LSHIFT</text>
       </g>
       <g transform="translate(97, 223) rotate(-10.0)" class="key keypos-21">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="-6" class="key tap">Z</text>
-        <text x="0" y="0" class="key hold small">Ctrl</text>
+        <text x="0" y="0" class="key tap">LCtl</text>
       </g>
       <g transform="translate(152, 174) rotate(-4.0)" class="key keypos-22">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="-6" class="key tap">X</text>
-        <text x="0" y="0" class="key hold small">Gui</text>
+        <text x="0" y="0" class="key tap">LEFT_GUI</text>
       </g>
       <g transform="translate(212, 140)" class="key keypos-23">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="-6" class="key tap">C</text>
-        <text x="0" y="0" class="key hold small">Alt</text>
+        <text x="0" y="0" class="key tap">X</text>
       </g>
       <g transform="translate(271, 168)" class="key keypos-24">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">V</text>
+        <text x="0" y="0" class="key tap">C</text>
       </g>
       <g transform="translate(330, 177)" class="key keypos-25">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">B</text>
+        <text x="0" y="0" class="key tap">V</text>
       </g>
       <g transform="translate(520, 177)" class="key keypos-26">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
@@ -432,7 +429,7 @@
       </g>
       <g transform="translate(381, 270) rotate(30.0)" class="key keypos-34">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">LShf</text>
+        <text x="0" y="0" class="key tap">F</text>
       </g>
       <g transform="translate(470, 270) rotate(-30.0)" class="key keypos-35">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
