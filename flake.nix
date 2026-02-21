@@ -1,5 +1,5 @@
 {
-  description = "TOTEM split keyboard — ZMK firmware, config, and GUI";
+  description = "TOTEM split keyboard — ZMK firmware & config";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -15,24 +15,13 @@
       inputs.zephyr.follows = "zephyr";
       # Don't follow nixpkgs — zephyr-nix needs python310 which newer nixpkgs dropped
     };
-
-    # Rust toolchain (Tauri GUI)
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, zephyr-nix, rust-overlay, ... }:
+  outputs = { self, nixpkgs, flake-utils, zephyr-nix, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ (import rust-overlay) ];
-        pkgs = import nixpkgs { inherit system overlays; };
+        pkgs = import nixpkgs { inherit system; };
         zephyr = zephyr-nix.packages.${system};
-
-        rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-          extensions = [ "rust-src" "rustfmt" ];
-        };
 
         # ── Shell script ───────────────────────────────────────────
 
@@ -111,15 +100,6 @@
               echo "  → build/xiao-bootloader-update.uf2"
               ;;
 
-            gui)
-              cd "$ROOT/app"
-              if [ ! -d node_modules ]; then
-                echo "Installing dependencies..."
-                pnpm install
-              fi
-              WEBKIT_DISABLE_DMABUF_RENDERER=1 pnpm tauri dev
-              ;;
-
             *)
               echo "TOTEM keyboard tools"
               echo ""
@@ -128,7 +108,6 @@
               echo "  totem              Build ZMK firmware (left + right + reset)"
               echo "  totem bootloader   Download XIAO nRF52840 bootloader"
               echo "  totem update       Update ZMK source (west update)"
-              echo "  totem gui          Run TOTEM GUI (Tauri dev server)"
               echo ""
               echo "  All build outputs → build/"
               ;;
@@ -146,39 +125,11 @@
             ninja
             protobuf  # Required for ZMK Studio
 
-            # Rust (Tauri GUI)
-            rustToolchain
-            llvmPackages.libclang
-            llvmPackages.clang
-
-            # Build tools
-            pkg-config
-
-            # Tauri system deps
-            nodejs_22
-            pnpm
-            gtk3
-            webkitgtk_4_1
-            libsoup_3
-            openssl
-            glib
-            cairo
-            pango
-            gdk-pixbuf
-            atk
-            libappindicator-gtk3
-            librsvg
-            dbus
-            udev
-
             # Tools
             picocom
           ];
 
           packages = [ totem-script gen-svg-script ];
-
-          LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-          BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.lib.getVersion pkgs.llvmPackages.clang}/include";
 
           env = {
             PYTHONPATH = "${zephyr.pythonEnv}/${zephyr.pythonEnv.sitePackages}";
@@ -190,7 +141,6 @@
             echo "  totem              Build ZMK firmware (left + right + reset)"
             echo "  totem bootloader   Download XIAO nRF52840 bootloader"
             echo "  totem update       Update ZMK source (west update)"
-            echo "  totem gui          Run TOTEM GUI (Tauri dev server)"
             echo "  gen-svg            Regenerate layer SVG diagrams from keymap"
             echo ""
             echo "  All build outputs → build/"
