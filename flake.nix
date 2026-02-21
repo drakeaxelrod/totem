@@ -7,7 +7,7 @@
 
     # Zephyr SDK + Python environment for ZMK builds
     zephyr = {
-      url = "github:zmkfirmware/zephyr/v3.5.0+zmk-fixes";
+      url = "github:zmkfirmware/zephyr/v4.1.0+zmk-fixes";
       flake = false;
     };
     zephyr-nix = {
