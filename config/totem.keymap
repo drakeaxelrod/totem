@@ -411,60 +411,60 @@
         base_layer {
             display-name = "BASE";
             bindings = <
-           &kp B  &kp L  &kp D  &kp C  &kp V  &kp J  &kp Y  &kp O  &kp U  &comma_morph
-           &hml LGUI N  &hml LALT R  &hml LCTRL T  &hml LSHFT S  &kp G  &kp P  &hmr RSHFT H  &hmr RCTRL A  &hmr RALT E  &hmr RGUI I
-&kp LSHFT  &kp X  &kp Q  &kp M  &hml LS(LC(LA(LGUI))) W  &kp Z  &kp K  &hmr RS(RC(RA(RGUI))) F  &kp SQT  &kp SEMI  &dot_morph  &kp RSHFT
-                                    &lt_th UTIL ESC  &lt_th NAV SPACE  &kp TAB  &kp RET  &lt_th NUM BSPC  &lt_th FUN DEL
+           &kp B        &kp L        &kp D            &kp C                    &kp V      &kp J    &kp Y                    &kp O           &kp U        &kp COMMA
+           &hml LGUI N  &hml LALT R  &hml LCTRL T     &hml LSHFT S             &kp G      &kp P    &hmr RSHFT H             &hmr RCTRL A    &hmr RALT E  &hmr RGUI I
+&kp LSHFT  &kp X        &kp Q        &kp M            &hml LS(LC(LA(LGUI))) W  &kp Z      &kp K    &hmr RS(RC(RA(RGUI))) F  &kp SQT         &kp SEMI     &kp PERIOD   &kp RSHFT
+                                     &lt_th UTIL ESC  &lt_th NAV SPACE         &kp TAB    &kp RET  &lt_th NUM BSPC          &lt_th FUN DEL
             >;
         };
 
         nav_layer {
             display-name = "NAV";
             bindings = <
-           &kp K_UNDO  &kp K_CUT  &kp K_COPY  &kp K_PASTE  &kp K_REDO  &kp HOME  &kp PG_DN  &kp PG_UP  &kp END  &kp DEL
-           &kp LGUI  &kp LALT  &kp LCTRL  &kp LSHFT  &trans  &trans  &kp LEFT  &kp DOWN  &kp UP  &kp RIGHT
-&kp K_BACK  &trans  &trans  &trans  &trans  &trans  &kp INS  &caps_word  &kp K_APP  &trans  &trans  &kp K_FORWARD
-                                    &trans  &trans  &trans  &trans  &trans  &trans
+            &kp K_UNDO  &kp K_CUT  &kp K_COPY  &kp K_PASTE  &kp K_REDO    &kp HOME   &kp INS     &trans     &kp END  &kp DEL
+            &kp LGUI    &kp LALT   &kp LCTRL   &kp LSHFT    &trans        &kp PG_UP  &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT
+&kp K_BACK  &trans      &trans     &trans      &trans       &trans        &kp PG_DN  &caps_word  &kp K_APP  &trans   &trans     &kp K_FORWARD
+                                   &trans      &trans       &trans        &trans     &trans      &trans
             >;
         };
 
         num_layer {
             display-name = "NUM";
             bindings = <
-           &kp KP_PLUS  &kp N7  &kp N8  &kp N9  &kp N0  &trans  &trans  &trans  &trans  &trans
-           &kp KP_MULTIPLY  &kp N4  &kp N5  &kp N6  &kp EQUAL  &trans  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
-&kp LPAR  &kp MINUS  &kp N1  &kp N2  &kp N3  &kp FSLH  &trans  &trans  &trans  &trans  &trans  &kp RPAR
-                                    &trans  &kp DOT  &kp SEMI  &trans  &trans  &trans
+          &kp PLUS   &kp N7  &kp N8  &kp N9   &kp N0       &trans  &trans     &trans     &trans    &trans
+          &kp STAR   &kp N4  &kp N5  &kp N6   &kp EQUAL    &trans  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
+&kp LPAR  &kp MINUS  &kp N1  &kp N2  &kp N3   &kp FSLH     &trans  &trans     &trans     &trans    &trans    &kp RPAR
+                             &trans  &kp DOT  &kp SEMI     &trans  &trans     &trans
             >;
         };
 
         fun_layer {
             display-name = "FUN";
             bindings = <
-           &kp F12  &kp F7  &kp F8  &kp F9  &kp F10  &kp PSCRN  &kp C_VOL_DN  &kp C_VOL_UP  &kp C_MUTE  &kp SLCK
-           &kp F11  &kp F4  &kp F5  &kp F6  &kp F11  &trans  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
-&trans  &trans  &kp F1  &kp F2  &kp F3  &kp F12  &kp PAUSE_BREAK  &kp C_BRI_DN  &kp C_BRI_UP  &trans  &trans  &tog GAME
-                                    &trans  &trans  &trans  &kp C_PP  &kp C_PREV  &kp C_NEXT
+        &trans  &kp F7  &kp F8  &kp F9  &kp F10    &kp PSCRN        &kp C_VOL_DN  &kp C_VOL_UP  &kp C_MUTE  &kp SLCK
+        &trans  &kp F4  &kp F5  &kp F6  &kp F11    &trans           &kp LSHFT     &kp LCTRL     &kp LALT    &kp LGUI
+&trans  &trans  &kp F1  &kp F2  &kp F3  &kp F12    &kp PAUSE_BREAK  &kp C_BRI_DN  &kp C_BRI_UP  &trans      &trans    &tog GAME
+                        &trans  &trans  &trans     &kp C_PP         &kp C_PREV    &kp C_NEXT
             >;
         };
 
         util_layer {
             display-name = "UTIL";
             bindings = <
-           &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &trans  &msc SCRL_UP  &msc SCRL_DOWN  &kp C_VOL_UP  &msc SCRL_LEFT  &msc SCRL_RIGHT
-           &kp LGUI  &kp LALT  &kp LCTRL  &kp LSHFT  &trans  &trans  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT
-&trans  &out OUT_TOG  &trans  &trans  &trans  &trans  &trans  &mkp MB4  &mkp MB5  &trans  &trans  &kp C_MUTE
-                                    &trans  &trans  &trans  &mkp LCLK  &mkp RCLK  &mkp MCLK
+        &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4      &trans     &trans          &trans          &trans        &trans
+        &kp LGUI      &kp LALT      &kp LCTRL     &kp LSHFT     &bt BT_CLR        &trans     &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT
+&trans  &trans        &trans        &trans        &out OUT_TOG  &bt BT_CLR_ALL    &trans     &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP  &msc SCRL_RIGHT  &trans
+                                    &trans        &trans        &trans            &mkp LCLK  &mkp RCLK       &mkp MCLK
             >;
         };
 
         game_layer {
             display-name = "GAME";
             bindings = <
-           &kp ESCAPE  &kp Q  &kp UP_ARROW  &kp R  &kp T  &kp N1  &kp N2  &kp N3  &kp N4  &kp N5
-           &kp LEFT_SHIFT  &kp LEFT  &kp DOWN  &kp RIGHT_ARROW  &kp G  &kp N6  &kp N7  &kp N8  &kp N9  &kp N0
-&kp TAB  &mt LCTRL Z  &mt LGUI X  &mt LALT C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &tog GAME
-                                    &kp ESC  &kp SPACE  &kp LSHFT  &kp RET  &kp BSPC  &kp DEL
+            &kp TAB         &kp Q         &kp UP_ARROW  &kp E            &kp R    &kp N1   &kp N2    &kp N3     &kp N4   &kp N5
+            &kp LEFT_SHIFT  &kp LEFT      &kp DOWN      &kp RIGHT_ARROW  &kp G    &kp N6   &kp N7    &kp N8     &kp N9   &kp N0
+&kp LSHIFT  &kp LCTRL       &kp LEFT_GUI  &kp X         &kp C            &kp V    &kp N    &kp M     &kp COMMA  &kp DOT  &kp FSLH  &tog GAME
+                                          &kp ESC       &kp SPACE        &kp F    &kp RET  &kp BSPC  &kp DEL
             >;
         };
     };
