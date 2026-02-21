@@ -7,7 +7,7 @@
 #include <dt-bindings/zmk/outputs.h>
 
 // ── Mouse speed tuning ──────────────────────────────────────────────
-#define MOUSE_TIME_TO_MAX_SPEED 500
+#define MOUSE_TIME_TO_MAX_SPEED 800
 #define U_MOUSE_MOVE_MAX 3000
 #define U_MOUSE_SCROLL_MAX 20
 
