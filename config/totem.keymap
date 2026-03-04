@@ -1,20 +1,20 @@
 // TOTEM Gallium layout — ported from RMK firmware (keymap.rs + behavior.rs)
 // Home row mods (GACS), combos, mod-morphs, macro, mouse keys, caps word
-
-#include <behaviors.dtsi>
-#include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/keys.h>
-#include <dt-bindings/zmk/outputs.h>
-
 // ── Mouse speed tuning ──────────────────────────────────────────────
+
 #define MOUSE_TIME_TO_MAX_SPEED 800
 #define U_MOUSE_MOVE_MAX 3000
 #define U_MOUSE_SCROLL_MAX 20
 
 // Must precede pointing.h so the defaults are overridden
+
 #define ZMK_POINTING_DEFAULT_MOVE_VAL U_MOUSE_MOVE_MAX
 #define ZMK_POINTING_DEFAULT_SCRL_VAL U_MOUSE_SCROLL_MAX
 
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
 #include <dt-bindings/zmk/pointing.h>
 
 #define BASE   0
@@ -36,13 +36,9 @@
 
 // Mouse behavior tuning
 
-&mmv {
-    time-to-max-speed-ms = <MOUSE_TIME_TO_MAX_SPEED>;
-};
+&mmv { time-to-max-speed-ms = <MOUSE_TIME_TO_MAX_SPEED>; };
 
-&msc {
-    time-to-max-speed-ms = <MOUSE_TIME_TO_MAX_SPEED>;
-};
+&msc { time-to-max-speed-ms = <MOUSE_TIME_TO_MAX_SPEED>; };
 
 / {
     behaviors {
@@ -272,8 +268,8 @@
         // ── Horizontal combos (same row, adjacent) ───────────────
         // Tight timing to prevent misfires during fast typing:
         // 40ms timeout + 280ms prior-idle
-
         // Top row
+
         combo_lbkt {
             timeout-ms = <40>;
             key-positions = <6 7>;
@@ -291,6 +287,7 @@
         };
 
         // Home row
+
         combo_lt {
             timeout-ms = <40>;
             key-positions = <15 16>;
@@ -324,6 +321,7 @@
         };
 
         // Bottom row
+
         combo_copy {
             timeout-ms = <40>;
             key-positions = <22 23>;
@@ -369,7 +367,7 @@
         combo_esc {
             timeout-ms = <50>;
             key-positions = <11 12 13>;
-            bindings = <&kp ESC>;
+            bindings = <&kp TAB>;
             require-prior-idle-ms = <200>;
             layers = <BASE>;
         };
@@ -400,10 +398,10 @@
         base_layer {
             display-name = "BASE";
             bindings = <
-           &kp B        &kp L        &kp D            &kp C                    &kp V      &kp J    &kp Y                    &kp O           &kp U        &kp COMMA
-           &hml LGUI N  &hml LALT R  &hml LCTRL T     &hml LSHFT S             &kp G      &kp P    &hmr RSHFT H             &hmr RCTRL A    &hmr RALT E  &hmr RGUI I
-&kp LSHFT  &kp X        &kp Q        &kp M            &hml LS(LC(LA(LGUI))) W  &kp Z      &kp K    &hmr RS(RC(RA(RGUI))) F  &kp SQT         &kp SEMI     &kp PERIOD   &kp RSHFT
-                                     &lt_th UTIL ESC  &lt_th NAV SPACE         &kp TAB    &kp RET  &lt_th NUM BSPC          &lt_th FUN DEL
+       &kp B        &kp L        &kp D            &kp C                    &kp V    &kp J  &kp Y                    &kp O                 &kp U        &kp COMMA
+       &hml LGUI N  &hml LALT R  &hml LCTRL T     &hml LSHFT S             &kp G    &kp P  &hmr RSHFT H             &hmr RCTRL A          &hmr RALT E  &hmr RGUI I
+&none  &kp X        &kp Q        &kp M            &hml LS(LC(LA(LGUI))) W  &kp Z    &kp K  &hmr RS(RC(RA(RGUI))) F  &kp SQT               &kp SEMI     &kp PERIOD   &none
+                                 &lt_th UTIL ESC  &lt_th NAV SPACE         &none    &none  &lt_th NUM ENTER         &lt_th FUN BACKSPACE
             >;
         };
 
