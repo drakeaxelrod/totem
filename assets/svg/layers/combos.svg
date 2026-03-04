@@ -382,7 +382,7 @@
       </g>
       <g transform="translate(34, 209) rotate(-10.0)" class="key keypos-20">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">LShf</text>
+        <text x="0" y="0" class="key tap">none</text>
       </g>
       <g transform="translate(97, 223) rotate(-10.0)" class="key keypos-21">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
@@ -428,7 +428,7 @@
       </g>
       <g transform="translate(817, 209) rotate(10.0)" class="key keypos-31">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">RShf</text>
+        <text x="0" y="0" class="key tap">none</text>
       </g>
       <g transform="translate(255, 236)" class="key keypos-32">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
@@ -442,20 +442,20 @@
       </g>
       <g transform="translate(381, 270) rotate(30.0)" class="key keypos-34">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">Tab</text>
+        <text x="0" y="0" class="key tap">none</text>
       </g>
       <g transform="translate(470, 270) rotate(-30.0)" class="key keypos-35">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">Ent</text>
+        <text x="0" y="0" class="key tap">none</text>
       </g>
       <g transform="translate(531, 245) rotate(-15.0)" class="key keypos-36">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="-6" class="key tap">Bksp</text>
+        <text x="0" y="-6" class="key tap">ENTER</text>
         <text x="0" y="0" class="key hold small">Num</text>
       </g>
       <g transform="translate(596, 236)" class="key keypos-37">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="-6" class="key tap">Del</text>
+        <text x="0" y="-6" class="key tap">BACKSPACE</text>
         <text x="0" y="0" class="key hold small">Fun</text>
       </g>
       <!-- combo connection lines -->
@@ -655,7 +655,7 @@
       </g>
       <g transform="translate(210.33333333333334, 96.33333333333334)">
         <rect rx="4" ry="4" x="-17.8" y="-10.0" width="35.6" height="20" class="combo" />
-        <text x="0" y="0" class="combo">Esc</text>
+        <text x="0" y="0" class="combo">Tab</text>
       </g>
       <g transform="translate(425.5, 112.0)">
         <rect rx="4" ry="4" x="-28.6" y="-10.0" width="57.2" height="20" class="combo" />
