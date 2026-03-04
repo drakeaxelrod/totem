@@ -397,7 +397,7 @@
       </g>
       <g transform="translate(520, 177)" class="key keypos-26">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap trans">▽</text>
+        <text x="0" y="0" class="key tap">MClk</text>
       </g>
       <g transform="translate(580, 168)" class="key keypos-27">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
@@ -433,15 +433,15 @@
       </g>
       <g transform="translate(470, 270) rotate(-30.0)" class="key keypos-35">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">LClk</text>
+        <text x="0" y="0" class="key tap trans">▽</text>
       </g>
       <g transform="translate(531, 245) rotate(-15.0)" class="key keypos-36">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">RClk</text>
+        <text x="0" y="0" class="key tap">LClk</text>
       </g>
       <g transform="translate(596, 236)" class="key keypos-37">
         <rect rx="6" ry="6" x="-28" y="-26" width="55" height="52" class="key" />
-        <text x="0" y="0" class="key tap">MClk</text>
+        <text x="0" y="0" class="key tap">RClk</text>
       </g>
     </g>
   </g>
