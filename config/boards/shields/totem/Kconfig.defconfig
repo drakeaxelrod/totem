@@ -30,8 +30,8 @@ config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY
 config ZMK_USB_BOOT
     default y
 
-config ZMK_STUDIO
-    default y
+config ZMK_SLEEP
+    default n
 
 endif
 

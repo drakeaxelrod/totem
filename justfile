@@ -34,7 +34,7 @@ build: build-dongle build-left build-right build-reset
 # Build dongle (USB central) firmware
 build-dongle:
     west build -s {{zmk_app}} -d {{bdir}}/dongle -b xiao_ble//zmk -- \
-        -DSHIELD=totem_dongle -DZMK_CONFIG={{config}}
+        -DSHIELD=totem_dongle -DZMK_CONFIG={{config}} -DSNIPPET=studio-rpc-usb-uart
 
 # Build left half firmware
 build-left:
