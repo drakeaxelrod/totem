@@ -526,8 +526,8 @@
       <path d="M 271,112 Q 237.2,117.7 210.33333333333334,96.33333333333334" class="combo" />
       <path d="M 271,112 Q 348.2,98.0 425.5,112.0" class="combo" />
       <path d="M 580,112 Q 502.8,98.0 425.5,112.0" class="combo" />
-      <path d="M 34,209 Q 229.8,223.0 425.5,209.0" class="combo" />
-      <path d="M 817,209 Q 621.2,223.0 425.5,209.0" class="combo" />
+      <path d="M 255,236 Q 340.2,250.0 425.5,236.0" class="combo" />
+      <path d="M 596,236 Q 510.8,250.0 425.5,236.0" class="combo" />
       <!-- combo boxes -->
       <g transform="translate(82.5, 140.5)">
         <rect rx="4" ry="4" x="-21.4" y="-10.0" width="42.8" height="20" class="combo" />
@@ -661,7 +661,7 @@
         <rect rx="4" ry="4" x="-28.6" y="-10.0" width="57.2" height="20" class="combo" />
         <text x="0" y="0" class="combo">CapsWd</text>
       </g>
-      <g transform="translate(425.5, 209.0)">
+      <g transform="translate(425.5, 236.0)">
         <rect rx="4" ry="4" x="-28.6" y="-10.0" width="57.2" height="20" class="combo" />
         <text x="0" y="0" class="combo">Studio</text>
       </g>
