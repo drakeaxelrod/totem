@@ -9,5 +9,6 @@ features:
   - studio
 siblings:
   - totem_left
+  - totem_left_central
   - totem_right
   - totem_dongle

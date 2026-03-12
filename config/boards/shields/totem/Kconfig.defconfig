@@ -54,6 +54,37 @@ config ZMK_IDLE_TIMEOUT
 
 endif
 
+if SHIELD_TOTEM_LEFT_CENTRAL
+
+config ZMK_KEYBOARD_NAME
+    default "TOTEM"
+
+config USB_DEVICE_PRODUCT
+    default "Totem Left Central"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS
+    default 1
+
+config BT_MAX_CONN
+    default 2
+
+config BT_MAX_PAIRED
+    default 2
+
+config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING
+    default y
+
+config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_PROXY
+    default y
+
+endif
+
 if SHIELD_TOTEM_RIGHT
 
 config USB_DEVICE_PRODUCT

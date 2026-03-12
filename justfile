@@ -20,8 +20,18 @@ init:
 update:
     west update
 
-# Build all firmware targets
-build: build-dongle build-left build-right build-reset
+# Build firmware (no dongle — left half acts as central via BLE)
+build: _build-left-central _build-right _build-reset
+    mkdir -p {{out}}
+    install -m 644 {{bdir}}/left-central/zephyr/zmk.uf2   {{out}}/totem-zmk-left.uf2
+    install -m 644 {{bdir}}/right/zephyr/zmk.uf2          {{out}}/totem-zmk-right.uf2
+    install -m 644 {{bdir}}/reset/zephyr/zmk.uf2 {{out}}/totem-zmk-reset.uf2
+    @echo ""
+    @echo "Firmware ready:"
+    @ls -1 {{out}}/totem-zmk-left.uf2 {{out}}/totem-zmk-right.uf2 {{out}}/totem-zmk-reset.uf2
+
+# Build firmware with dongle (dongle acts as USB central)
+build-dongle: _build-dongle _build-left _build-right _build-reset
     mkdir -p {{out}}
     install -m 644 {{bdir}}/dongle/zephyr/zmk.uf2         {{out}}/totem-zmk-dongle.uf2
     install -m 644 {{bdir}}/left/zephyr/zmk.uf2           {{out}}/totem-zmk-left.uf2
@@ -31,23 +41,25 @@ build: build-dongle build-left build-right build-reset
     @echo "Firmware ready:"
     @ls -1 {{out}}/totem-zmk-*.uf2
 
-# Build dongle (USB central) firmware
-build-dongle:
+# ── Internal build targets ──────────────────────────────────────────
+
+_build-dongle:
     west build -s {{zmk_app}} -d {{bdir}}/dongle -b xiao_ble//zmk -- \
         -DSHIELD=totem_dongle -DZMK_CONFIG={{config}} -DSNIPPET=studio-rpc-usb-uart
 
-# Build left half firmware
-build-left:
+_build-left-central:
+    west build -s {{zmk_app}} -d {{bdir}}/left-central -b xiao_ble//zmk -- \
+        -DSHIELD=totem_left_central -DZMK_CONFIG={{config}}
+
+_build-left:
     west build -s {{zmk_app}} -d {{bdir}}/left -b xiao_ble//zmk -- \
         -DSHIELD=totem_left -DZMK_CONFIG={{config}}
 
-# Build right half firmware
-build-right:
+_build-right:
     west build -s {{zmk_app}} -d {{bdir}}/right -b xiao_ble//zmk -- \
         -DSHIELD=totem_right -DZMK_CONFIG={{config}}
 
-# Build settings reset firmware
-build-reset:
+_build-reset:
     west build -s {{zmk_app}} -d {{bdir}}/reset -b xiao_ble//zmk -- \
         -DSHIELD=totem_reset -DZMK_CONFIG={{config}}
 
