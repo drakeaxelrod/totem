@@ -403,9 +403,9 @@
         base_layer {
             display-name = "BASE";
             bindings = <
-       &kp B        &kp L        &kp D            &kp C                    &kp V    &kp J  &kp Y                    &kp O                 &kp U        &kp COMMA
-       &hml LGUI N  &hml LALT R  &hml LCTRL T     &hml LSHFT S             &kp G      &kp P    &hmr RSHFT H             &hmr RCTRL A    &hmr RALT E  &hmr RGUI I
-&kp LSHFT  &kp X        &kp Q        &kp M            &hml LS(LC(LA(LGUI))) W  &kp Z      &kp K    &hmr RS(RC(RA(RGUI))) F  &kp SQT         &kp SEMI     &kp PERIOD   &kp RSHFT
+       &kp Q        &kp W        &kp E            &kp R                    &kp T    &kp Y  &kp U                    &kp I                 &kp O        &kp P
+       &hml LGUI A  &hml LALT S  &hml LCTRL D     &hml LSHFT F             &kp G    &kp H  &hmr RSHFT J             &hmr RCTRL K          &hmr RALT L  &hmr RGUI SEMI
+&kp LSHFT  &kp Z        &kp X        &kp C            &hml LS(LC(LA(LGUI))) V  &kp B    &kp N  &hmr RS(RC(RA(RGUI))) M  &kp COMMA             &kp DOT      &kp FSLH     &kp RSHFT
                                      &lt_th UTIL ESC  &lt_th NAV SPACE         &kp TAB    &kp RET  &lt_th NUM BSPC          &lt_th FUN DEL
             >;
         };
