@@ -1,4 +1,5 @@
 # TOTEM split keyboard — ZMK firmware build commands
+# Topology: Prospector dongle (USB central) + left/right halves (BLE peripherals)
 
 root    := justfile_directory()
 zmk_app := root / "zmk/app"
@@ -20,47 +21,16 @@ init:
 update:
     west update
 
-# Build firmware (no dongle — left half acts as central via BLE)
-build: _build-left-central _build-right _build-reset
+# Build all firmware: dongle (central) + left + right (peripherals) + reset
+build: _build-dongle _build-left _build-right _build-reset
     mkdir -p {{out}}
-    install -m 644 {{bdir}}/left-central/zephyr/zmk.uf2   {{out}}/totem-zmk-left.uf2
-    install -m 644 {{bdir}}/right/zephyr/zmk.uf2          {{out}}/totem-zmk-right.uf2
-    install -m 644 {{bdir}}/reset/zephyr/zmk.uf2 {{out}}/totem-zmk-reset.uf2
-    @echo ""
-    @echo "Firmware ready:"
-    @ls -1 {{out}}/totem-zmk-left.uf2 {{out}}/totem-zmk-right.uf2 {{out}}/totem-zmk-reset.uf2
-
-# Build firmware with dongle (dongle acts as USB central)
-build-dongle: _build-dongle _build-left _build-right _build-reset
-    mkdir -p {{out}}
-    install -m 644 {{bdir}}/dongle/zephyr/zmk.uf2         {{out}}/totem-zmk-dongle.uf2
-    install -m 644 {{bdir}}/left/zephyr/zmk.uf2           {{out}}/totem-zmk-left.uf2
-    install -m 644 {{bdir}}/right/zephyr/zmk.uf2          {{out}}/totem-zmk-right.uf2
-    install -m 644 {{bdir}}/reset/zephyr/zmk.uf2 {{out}}/totem-zmk-reset.uf2
+    install -m 644 {{bdir}}/dongle/zephyr/zmk.uf2  {{out}}/totem-zmk-dongle.uf2
+    install -m 644 {{bdir}}/left/zephyr/zmk.uf2    {{out}}/totem-zmk-left.uf2
+    install -m 644 {{bdir}}/right/zephyr/zmk.uf2   {{out}}/totem-zmk-right.uf2
+    install -m 644 {{bdir}}/reset/zephyr/zmk.uf2   {{out}}/totem-zmk-reset.uf2
     @echo ""
     @echo "Firmware ready:"
     @ls -1 {{out}}/totem-zmk-*.uf2
-
-# Build QWERTY firmware (no dongle — left half acts as central via BLE)
-build-qwerty: _build-left-central-qwerty _build-right-qwerty _build-reset-qwerty
-    mkdir -p {{out}}
-    install -m 644 {{bdir}}/left-central-qwerty/zephyr/zmk.uf2   {{out}}/totem-zmk-left-qwerty.uf2
-    install -m 644 {{bdir}}/right-qwerty/zephyr/zmk.uf2          {{out}}/totem-zmk-right-qwerty.uf2
-    install -m 644 {{bdir}}/reset-qwerty/zephyr/zmk.uf2          {{out}}/totem-zmk-reset-qwerty.uf2
-    @echo ""
-    @echo "QWERTY firmware ready:"
-    @ls -1 {{out}}/totem-zmk-left-qwerty.uf2 {{out}}/totem-zmk-right-qwerty.uf2 {{out}}/totem-zmk-reset-qwerty.uf2
-
-# Build QWERTY firmware with dongle
-build-dongle-qwerty: _build-dongle-qwerty _build-left-qwerty _build-right-qwerty _build-reset-qwerty
-    mkdir -p {{out}}
-    install -m 644 {{bdir}}/dongle-qwerty/zephyr/zmk.uf2         {{out}}/totem-zmk-dongle-qwerty.uf2
-    install -m 644 {{bdir}}/left-qwerty/zephyr/zmk.uf2           {{out}}/totem-zmk-left-qwerty.uf2
-    install -m 644 {{bdir}}/right-qwerty/zephyr/zmk.uf2          {{out}}/totem-zmk-right-qwerty.uf2
-    install -m 644 {{bdir}}/reset-qwerty/zephyr/zmk.uf2          {{out}}/totem-zmk-reset-qwerty.uf2
-    @echo ""
-    @echo "QWERTY dongle firmware ready:"
-    @ls -1 {{out}}/totem-zmk-*-qwerty.uf2
 
 # ── Internal build targets ──────────────────────────────────────────
 
@@ -68,42 +38,17 @@ _build-dongle:
     west build -p always -s {{zmk_app}} -d {{bdir}}/dongle -b xiao_ble//zmk -- \
         -DSHIELD='totem_dongle prospector_adapter' -DZMK_CONFIG={{config}} -DSNIPPET=studio-rpc-usb-uart
 
-_build-left-central:
-    west build -s {{zmk_app}} -d {{bdir}}/left-central -b xiao_ble//zmk -- \
-        -DSHIELD=totem_left_central -DZMK_CONFIG={{config}}
-
 _build-left:
-    west build -s {{zmk_app}} -d {{bdir}}/left -b xiao_ble//zmk -- \
+    west build -p always -s {{zmk_app}} -d {{bdir}}/left -b xiao_ble//zmk -- \
         -DSHIELD=totem_left -DZMK_CONFIG={{config}}
 
 _build-right:
-    west build -s {{zmk_app}} -d {{bdir}}/right -b xiao_ble//zmk -- \
+    west build -p always -s {{zmk_app}} -d {{bdir}}/right -b xiao_ble//zmk -- \
         -DSHIELD=totem_right -DZMK_CONFIG={{config}}
 
 _build-reset:
-    west build -s {{zmk_app}} -d {{bdir}}/reset -b xiao_ble//zmk -- \
+    west build -p always -s {{zmk_app}} -d {{bdir}}/reset -b xiao_ble//zmk -- \
         -DSHIELD=totem_reset -DZMK_CONFIG={{config}}
-
-_build-dongle-qwerty:
-    west build -p always -s {{zmk_app}} -d {{bdir}}/dongle-qwerty -b xiao_ble//zmk -- \
-        -DSHIELD='totem_dongle prospector_adapter' -DZMK_CONFIG={{config}} -DSNIPPET=studio-rpc-usb-uart \
-        -DKEYMAP_FILE={{config}}/totem_qwerty.keymap
-
-_build-left-central-qwerty:
-    west build -s {{zmk_app}} -d {{bdir}}/left-central-qwerty -b xiao_ble//zmk -- \
-        -DSHIELD=totem_left_central -DZMK_CONFIG={{config}} -DKEYMAP_FILE={{config}}/totem_qwerty.keymap
-
-_build-left-qwerty:
-    west build -s {{zmk_app}} -d {{bdir}}/left-qwerty -b xiao_ble//zmk -- \
-        -DSHIELD=totem_left -DZMK_CONFIG={{config}} -DKEYMAP_FILE={{config}}/totem_qwerty.keymap
-
-_build-right-qwerty:
-    west build -s {{zmk_app}} -d {{bdir}}/right-qwerty -b xiao_ble//zmk -- \
-        -DSHIELD=totem_right -DZMK_CONFIG={{config}} -DKEYMAP_FILE={{config}}/totem_qwerty.keymap
-
-_build-reset-qwerty:
-    west build -s {{zmk_app}} -d {{bdir}}/reset-qwerty -b xiao_ble//zmk -- \
-        -DSHIELD=totem_reset -DZMK_CONFIG={{config}} -DKEYMAP_FILE={{config}}/totem_qwerty.keymap
 
 # Flash a target to plugged-in XIAO (double-tap reset first)
 # Usage: just flash dongle | left | right | reset
