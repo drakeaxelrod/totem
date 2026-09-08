@@ -8,7 +8,7 @@ ZMK firmware for the [TOTEM](https://github.com/GEIGEIGEIST/TOTEM) 38-key split 
 
 ### Base (Gallium)
 
-![Base Layer](./assets/svg/layers/base.svg)
+![Base Layer](./assets/svg/layers/base.svg) 
 
 - **Home row mods** (GACS): Gui/Alt/Ctrl/Shift on left, mirrored on right
 - **Hyper** (all 4 mods) on W and F
