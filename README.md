@@ -4,36 +4,54 @@ ZMK firmware for the [TOTEM](https://github.com/GEIGEIGEIST/TOTEM) 38-key split 
 
 ## Layout
 
-**Gallium** alpha layout with home row mods (GACS order), 33 combos, 2 mod-morphs, mouse keys, and 6 layers.
+**Miryoku** on **QWERTY**: home row mods (GACS order), six thumb-held layers, combos, mouse keys, and a toggled Game layer.
 
-### Base (Gallium)
+### Thumbs
 
-![Base Layer](./assets/svg/layers/base.svg) 
+| | Outer | Middle | Inner |
+|---|---|---|---|
+| Left hand | Esc / **Media** | Space / **Nav** | Tab / **Mouse** |
+| Right hand | Delete / **Fun** | Backspace / **Num** | Enter / **Sym** |
+
+Tap for the key, hold for the layer. The hand holding a layer gets the home row mods; the other hand gets the layer's keys.
+
+### Base (QWERTY)
+
+![Base Layer](./assets/svg/layers/base.svg)
 
 - **Home row mods** (GACS): Gui/Alt/Ctrl/Shift on left, mirrored on right
-- **Hyper** (all 4 mods) on W and F
-- **Mod-morphs**: `,` -> `;` and `.` -> `:` when shifted
+- **Hyper** (all 4 mods) on V and M
 - **Side buttons** (pos 20/31): dedicated LShift / RShift
 
 ### Nav (hold Space)
 
 ![Nav Layer](./assets/svg/layers/nav.svg)
 
+### Mouse (hold Tab)
+
+![Mouse Layer](./assets/svg/layers/mouse.svg)
+
+### Media + Bluetooth (hold Escape)
+
+![Media Layer](./assets/svg/layers/media.svg)
+
 ### Num (hold Backspace)
 
 ![Num Layer](./assets/svg/layers/num.svg)
+
+### Sym (hold Enter)
+
+![Sym Layer](./assets/svg/layers/sym.svg)
 
 ### Fun (hold Delete)
 
 ![Fun Layer](./assets/svg/layers/fun.svg)
 
-### Util + Mouse (hold Escape)
-
-![Util Layer](./assets/svg/layers/util.svg)
-
 ### Game (toggle from Fun layer)
 
 ![Game Layer](./assets/svg/layers/game.svg)
+
+**Boot** on the top corner key of the hand holding a layer: double-tap to put that half into its bootloader.
 
 ## Combos (80ms timeout, Base layer)
 

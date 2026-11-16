@@ -36,15 +36,17 @@ KEY_POSITIONS = [
 
 # Which thumb position activates each layer (for "held" highlighting)
 HELD_THUMBS = {
-    1: 33,   # NAV  → hold Space thumb
-    2: 36,   # NUM  → hold Backspace thumb
-    3: 37,   # FUN  → hold Delete thumb
-    4: 32,   # UTIL → hold Escape thumb
-    # GAME (5) is toggled, no held thumb
+    1: 33,   # NAV   → hold Space thumb
+    2: 34,   # MOUSE → hold Tab thumb
+    3: 32,   # MEDIA → hold Escape thumb
+    4: 36,   # NUM   → hold Backspace thumb
+    5: 35,   # SYM   → hold Enter thumb
+    6: 37,   # FUN   → hold Delete thumb
+    # GAME (7) is toggled, no held thumb
 }
 
-LAYER_NAMES = ["base", "nav", "num", "fun", "util", "game"]
-LAYER_DISPLAY = ["Base (Gallium)", "Nav", "Num", "Fun", "Util + Mouse", "Game"]
+LAYER_NAMES = ["base", "nav", "mouse", "media", "num", "sym", "fun", "game"]
+LAYER_DISPLAY = ["Base (QWERTY)", "Nav", "Mouse", "Media", "Num", "Sym", "Fun", "Game"]
 
 # ── Key code → display label mapping ──────────────────────────────────
 
@@ -82,7 +84,7 @@ KEY_LABELS = {
     "C_VOL_UP": "Vol+", "C_VOL_DN": "Vol\u2212", "C_MUTE": "Mute",
     "C_BRI_UP": "Bri+", "C_BRI_DN": "Bri\u2212",
     "C_PP": "Play", "C_PREV": "Prev", "C_NEXT": "Next",
-    "C_PLAY_PAUSE": "Play",
+    "C_PLAY_PAUSE": "Play", "C_STOP": "Stop",
     # Edit
     "K_UNDO": "Undo", "K_CUT": "Cut", "K_COPY": "Copy",
     "K_PASTE": "Paste", "K_REDO": "Redo",
@@ -100,10 +102,10 @@ MOD_LABELS = {
 }
 
 LAYER_LABELS = {
-    "BASE": "Base", "NAV": "Nav", "NUM": "Num",
-    "FUN": "Fun", "UTIL": "Util", "GAME": "Game",
-    "0": "Base", "1": "Nav", "2": "Num",
-    "3": "Fun", "4": "Util", "5": "Game",
+    "BASE": "Base", "NAV": "Nav", "MOUSE": "Mouse", "MEDIA": "Media",
+    "NUM": "Num", "SYM": "Sym", "FUN": "Fun", "GAME": "Game",
+    "0": "Base", "1": "Nav", "2": "Mouse", "3": "Media",
+    "4": "Num", "5": "Sym", "6": "Fun", "7": "Game",
 }
 
 
@@ -198,6 +200,9 @@ def parse_binding(binding_str):
     if behavior == "trans":
         return ("\u25bd", None, True)
 
+    if behavior == "none":
+        return ("", None, False)
+
     if behavior == "kp":
         return (key_label(args[0]) if args else "?", None, False)
 
@@ -234,6 +239,12 @@ def parse_binding(binding_str):
             return (f"BT{n}", None, False)
         if args and args[0] == "BT_CLR":
             return ("BTClr", None, False)
+        if args and args[0] == "BT_CLR_ALL":
+            return ("ClrAll", None, False)
+        if args and args[0] == "BT_PRV":
+            return ("BTPrv", None, False)
+        if args and args[0] == "BT_NXT":
+            return ("BTNxt", None, False)
         return ("BT", None, False)
 
     if behavior == "out":
@@ -266,6 +277,9 @@ def parse_binding(binding_str):
 
     if behavior == "tog":
         return (layer_label(args[0]) if args else "Tog", None, False)
+
+    if behavior in ("bootloader", "td_boot"):
+        return ("Boot", None, False)
 
     if behavior == "studio_unlock":
         return ("Studio", None, False)
@@ -561,8 +575,8 @@ def main():
     combos = parse_combos(KEYMAP)
     header, footer = get_svg_header_footer()
 
-    if len(layers) != 6:
-        print(f"Warning: expected 6 layers, found {len(layers)}")
+    if len(layers) != len(LAYER_NAMES):
+        print(f"Warning: expected {len(LAYER_NAMES)} layers, found {len(layers)}")
 
     SVG_DIR.mkdir(parents=True, exist_ok=True)
 

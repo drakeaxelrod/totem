@@ -1,5 +1,9 @@
-// TOTEM Gallium layout — ported from RMK firmware (keymap.rs + behavior.rs)
-// Home row mods (GACS), combos, mod-morphs, macro, mouse keys, caps word
+// TOTEM — Miryoku (QWERTY)
+// Home row mods (GACS), Miryoku's six thumb keys and the layers they hold,
+// plus combos, mouse keys, caps word and a toggled Game layer.
+//
+//     left  thumbs: Esc / MEDIA    Space / NAV    Tab / MOUSE
+//     right thumbs: Enter / SYM    Bksp / NUM     Del / FUN
 // ── Mouse speed tuning ──────────────────────────────────────────────
 
 #define MOUSE_TIME_TO_MAX_SPEED 800
@@ -19,10 +23,12 @@
 
 #define BASE   0
 #define NAV    1
-#define NUM    2
-#define FUN    3
-#define UTIL   4
-#define GAME   5
+#define MOUSE  2
+#define MEDIA  3
+#define NUM    4
+#define SYM    5
+#define FUN    6
+#define GAME   7
 
 // Key position groups for reference:
 //          0  1  2  3  4     5  6  7  8  9       <- top
@@ -86,6 +92,14 @@
             bindings = <&mo>, <&kp>;
         };
 
+        // Double-tap to put the half the key is on into its bootloader
+        // (Miryoku guards its boot key the same way)
+        td_boot: tap_dance_bootloader {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <250>;
+            bindings = <&none>, <&bootloader>;
+        };
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -400,53 +414,77 @@
     keymap {
         compatible = "zmk,keymap";
 
+        // Layers follow Miryoku: the hand holding the layer gets the home-row
+        // mods (and a double-tap bootloader key on its top corner), the other
+        // hand gets the layer's keys. The outer pinky keys stay Shift.
+
         base_layer {
             display-name = "BASE";
             bindings = <
-       &kp B        &kp L        &kp D            &kp C                    &kp V    &kp J  &kp Y                    &kp O                 &kp U        &kp COMMA
-       &hml LGUI N  &hml LALT R  &hml LCTRL T     &hml LSHFT S             &kp G      &kp P    &hmr RSHFT H             &hmr RCTRL A    &hmr RALT E  &hmr RGUI I
-&kp LSHFT  &kp X        &kp Q        &kp M            &hml LS(LC(LA(LGUI))) W  &kp Z      &kp K    &hmr RS(RC(RA(RGUI))) F  &kp SQT         &kp SEMI     &kp PERIOD   &kp RSHFT
-                                     &lt_th UTIL ESC  &lt_th NAV SPACE         &kp TAB    &kp RET  &lt_th NUM BSPC         &lt_th FUN DEL
+           &kp Q        &kp W        &kp E         &kp R                    &kp T        &kp Y    &kp U                    &kp I         &kp O        &kp P
+           &hml LGUI A  &hml LALT S  &hml LCTRL D  &hml LSHFT F             &kp G        &kp H    &hmr RSHFT J             &hmr RCTRL K  &hmr RALT L  &hmr RGUI SQT
+&kp LSHFT  &kp Z        &kp X        &kp C         &hml LS(LC(LA(LGUI))) V  &kp B        &kp N    &hmr RS(RC(RA(RGUI))) M  &kp COMMA     &kp DOT      &kp FSLH       &kp RSHFT
+                                     &lt_th MEDIA ESC  &lt_th NAV SPACE     &lt_th MOUSE TAB    &lt_th SYM RET  &lt_th NUM BSPC  &lt_th FUN DEL
             >;
         };
 
         nav_layer {
             display-name = "NAV";
             bindings = <
-            &kp K_UNDO  &kp K_CUT  &kp K_COPY  &kp K_PASTE  &kp K_REDO    &kp HOME   &kp INS     &trans     &kp END  &kp DEL
-            &kp LGUI    &kp LALT   &kp LCTRL   &kp LSHFT    &trans        &kp PG_UP  &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT
-&kp K_BACK  &trans      &trans     &trans      &trans       &trans        &kp PG_DN  &caps_word  &kp K_APP  &trans   &trans     &kp K_FORWARD
-                              &trans      &trans       &trans        &trans         &trans      &trans
+        &td_boot  &none     &none      &none      &none    &kp K_REDO  &kp K_PASTE  &kp K_COPY  &kp K_CUT  &kp K_UNDO
+        &kp LGUI  &kp LALT  &kp LCTRL  &kp LSHFT  &none    &caps_word  &kp LEFT     &kp DOWN    &kp UP     &kp RIGHT
+&trans  &none     &none     &none      &none      &none    &kp INS     &kp HOME     &kp PG_DN   &kp PG_UP  &kp END     &trans
+                            &none      &trans     &none    &kp RET     &kp BSPC     &kp DEL
+            >;
+        };
+
+        mouse_layer {
+            display-name = "MOUSE";
+            bindings = <
+        &td_boot  &none     &none      &none      &none    &kp K_REDO  &kp K_PASTE     &kp K_COPY      &kp K_CUT     &kp K_UNDO
+        &kp LGUI  &kp LALT  &kp LCTRL  &kp LSHFT  &none    &none       &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT
+&trans  &none     &none     &none      &none      &none    &none       &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP  &msc SCRL_RIGHT  &trans
+                            &none      &none      &trans   &mkp RCLK   &mkp LCLK       &mkp MCLK
+            >;
+        };
+
+        media_layer {
+            display-name = "MEDIA";
+            bindings = <
+              &td_boot  &none     &none      &none      &none             &kp C_BRI_DN  &kp C_BRI_UP  &bt BT_PRV    &bt BT_NXT    &none
+              &kp LGUI  &kp LALT  &kp LCTRL  &kp LSHFT  &bt BT_CLR        &out OUT_TOG  &kp C_PREV    &kp C_VOL_DN  &kp C_VOL_UP  &kp C_NEXT
+&out OUT_USB  &none     &none     &none      &none      &bt BT_CLR_ALL    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &out OUT_BLE
+                                  &trans     &none      &none             &kp C_STOP    &kp C_PP      &kp C_MUTE
             >;
         };
 
         num_layer {
             display-name = "NUM";
             bindings = <
-          &kp PLUS   &kp N7  &kp N8  &kp N9   &kp N0       &trans  &trans     &trans     &trans    &trans
-          &kp STAR   &kp N4  &kp N5  &kp N6   &kp EQUAL    &trans  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
-&kp LPAR  &kp MINUS  &kp N1  &kp N2  &kp N3   &kp FSLH     &trans  &trans     &trans     &trans    &trans    &kp RPAR
-                             &trans  &kp DOT  &kp SEMI     &trans  &trans     &trans
+        &kp LBKT   &kp N7  &kp N8  &kp N9  &kp RBKT     &none  &none      &none      &none     &td_boot
+        &kp SEMI   &kp N4  &kp N5  &kp N6  &kp EQUAL    &none  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
+&trans  &kp GRAVE  &kp N1  &kp N2  &kp N3  &kp BSLH     &none  &none      &none      &none     &none     &trans
+                           &kp DOT &kp N0  &kp MINUS    &none  &trans     &none
+            >;
+        };
+
+        sym_layer {
+            display-name = "SYM";
+            bindings = <
+        &kp LBRC   &kp AMPS  &kp STAR   &kp LPAR   &kp RBRC    &none   &none      &none      &none     &td_boot
+        &kp COLON  &kp DLLR  &kp PRCNT  &kp CARET  &kp PLUS    &none   &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
+&trans  &kp TILDE  &kp EXCL  &kp AT     &kp HASH   &kp PIPE    &none   &none      &none      &none     &none     &trans
+                             &kp LPAR   &kp RPAR   &kp UNDER   &trans  &none      &none
             >;
         };
 
         fun_layer {
             display-name = "FUN";
             bindings = <
-        &trans  &kp F7  &kp F8  &kp F9  &kp F10    &kp PSCRN        &kp C_VOL_DN  &kp C_VOL_UP  &kp C_MUTE  &kp SLCK
-        &trans  &kp F4  &kp F5  &kp F6  &kp F11    &kp C_PP         &kp LSHFT     &kp LCTRL     &kp LALT    &kp LGUI
-&trans  &trans  &kp F1  &kp F2  &kp F3  &kp F12    &kp PAUSE_BREAK  &kp C_BRI_DN  &kp C_BRI_UP  &trans      &trans    &tog GAME
-                        &trans  &trans  &trans     &kp C_PP         &kp C_PREV    &kp C_NEXT
-            >;
-        };
-
-        util_layer {
-            display-name = "UTIL";
-            bindings = <
-        &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4      &trans     &trans          &trans          &trans        &trans
-        &kp LGUI      &kp LALT      &kp LCTRL     &kp LSHFT     &bt BT_CLR        &trans     &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT
-&out OUT_USB  &out OUT_BLE  &trans  &trans        &out OUT_TOG  &bt BT_CLR_ALL    &trans     &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP  &msc SCRL_RIGHT  &trans
-                                    &trans        &trans        &trans            &mkp LCLK  &mkp RCLK       &mkp MCLK
+        &kp F12  &kp F7  &kp F8  &kp F9  &kp PSCRN          &none  &none      &none      &none     &td_boot
+        &kp F11  &kp F4  &kp F5  &kp F6  &kp SLCK           &none  &kp LSHFT  &kp LCTRL  &kp LALT  &kp LGUI
+&trans  &kp F10  &kp F1  &kp F2  &kp F3  &kp PAUSE_BREAK    &none  &none      &none      &none     &none     &tog GAME
+                         &kp K_APP  &kp SPACE  &kp TAB      &none  &none      &trans
             >;
         };
 
